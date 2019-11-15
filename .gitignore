@@ -1,1 +1,8 @@
 .vscode/settings.json
+lvolkmann.pub
+app/config.py
+app/__pycache__/routes.cpython-37.pyc
+app/__pycache__/config.cpython-37.pyc
+app/__pycache__/__init__.cpython-37.pyc
+app/__pycache__/routes.cpython-37.pyc
+app/__pycache__/__init__.cpython-37.pyc
