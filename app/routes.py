@@ -21,4 +21,6 @@ def index():
     for element in cursor:
         result += element[0]
 
+    og_conn.close()
+
     return result
