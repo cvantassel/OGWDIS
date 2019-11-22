@@ -1,0 +1,67 @@
+<html> 
+    <head>
+        <link rel="stylesheet" href="../style.css" type="text/css"/>
+    </head>
+    <body id="homeBody">
+            <nav class="navbar">
+                <div class="container">
+                    
+                    <h1 class="logo"><a href="#">OGWDIS</a></h1>
+                    <ul class="nav nav-right">
+                    <li><a href="home">Home</a></li>
+                    <li><a href="#">History</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Preferences</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="container" style="display: flex;justify-content: space-evenly;">
+                <div class="homeContent">
+                    <h2> Your Tweet History</h2>
+                    <div style="text-align: center;">
+                        <input type="text" placeholder="Key, word, search"/>
+                        <button>Submit</button>
+                        <br/>
+                        <span>Sort By:</span>
+                        <button>Impact</button>
+                        <button>Favorites</button>
+                        <button>Reweets</button>
+                        <button>Replies</button>
+                        <select>
+                            {% for window in timeWindows %}
+                            <option value="{{ window.time }}">{{ window }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="checkbox"> Ascending </input>
+
+                    </div>
+                    <br/>
+                    <table>
+                        <tr>
+                            <th>#</th>
+                            <th>Date/Time</th>
+                            <th>Tweet</th>
+                            <th>Impact</th>
+                            <th>Favorites</th>
+                            <th>Retweets</th>
+                            <th>Replies</th>
+                            <th>Handles Mentioned</th>
+                        </tr>
+                        <tr>
+                            {% for tweet in tweets %}
+                            <td>{{ tweet.id }}</td>
+                            <td>{{ tweet.dateTime }}</td>
+                            <td>{{ tweet.content }}</td>
+                            <td>{{ tweet.impact }}</td>
+                            <td>{{ tweet.favorites }}</td>
+                            <td>{{ tweet.retweets }}</td>
+                            <td>{{ tweet.replies }}</td>
+                            <td>{{ tweet.handles }}</td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+    </body>
+</html>

@@ -1,0 +1,74 @@
+<html> 
+    <head>
+        <link rel="stylesheet" href="../style.css" type="text/css"/>
+    </head>
+    <body id="homeBody">
+            <nav class="navbar">
+                <div class="container">
+                    
+                    <h1 class="logo"><a href="#">OGWDIS</a></h1>
+                    <ul class="nav nav-right">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">History</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Preferences</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="container" style="display: flex;justify-content: space-evenly;">
+                <div class="homeContent">
+                    <h2> Your Top Five</h2>
+                    <div>
+                        <span>Sort By:</span>
+                        <button>Negative</button> 
+                        <button>Positive</button>
+                        <select>
+                            {% for window in timeWindows %}
+                            <option value="{{ window.time }}">{{ window.time }}</option>
+                            {% endfor %}Smashmouth
+                        </select>
+                    </div>
+                    <br/>
+                    <table>
+                        <tr>
+                            <th>#</th>
+                            <th>Date/Time</th>
+                            <th>Tweet</th>
+                            <th>Impact</th>
+                        </tr>
+                        <tr>
+                            {% for tweet in tweets %}
+                            <td>{{ tweet.id }}</td>
+                            <td>{{ tweet.dateTime }}</td>
+                            <td>{{ tweet.content }}</td>
+                            <td>{{ tweet.impact }}</td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </div>
+                <div style="flex-grow:1;"> 
+                    <div class="homeContent">
+                        <h2>Overview</h2>
+                        <p>Follow Count: {{ Overview.FollowCount }}</p>
+                        <p>Unfollow Count: {{ Overview.UnfollowCount }}</p>
+                        <p>Net Follow Count: {{ Overview.NetFollowCount }}</p>
+                        <p>Tweet Count: {{ Overview.TweetCount }}</p>
+                        <p>Avg Follow Rate: {{ Overview.AvgFollowRate }}</p>
+                        <p>% Change From Lifetime Rate: {{ Overview.ChangeFromLifetime }}</p>
+                    </div>
+                    <br>
+                    <div class="homeContent">
+                        <h2>Insights</h2>
+                        <table>
+                            <tr>
+                                <th>Phrases To Avoid</th>
+                            </tr>
+                            {% for word in phrasesToAvoid %}
+                            <tr> <td> {{ word }} </td></tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+    </body>
+</html>

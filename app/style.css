@@ -1,0 +1,228 @@
+* {
+    font-family: Arial;
+}
+html {
+    background-color: #eee;
+}
+h2 {
+  margin-top: 0px;
+}
+select {
+  margin-bottom: 10px;
+}
+
+#loginContainer {
+    background-color: #fff;
+    border-radius: 4px;    
+    display: flex;
+    flex-wrap: wrap;
+    width: 25%;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    padding: 30px;
+    justify-content: center;
+    margin-top: 10%;
+}
+input {
+    margin-bottom: 15px;
+}
+#loginBody {
+    display: flex;justify-content: center;
+}
+#homeBody {
+    padding: 0;
+    margin: 0;
+    line-height: 1.4;
+}
+.homeContent {
+    background-color: #fff;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    border-radius: 4px;    
+    padding: 30px;
+    margin: 0 15px;
+    flex-grow: 2;
+}
+
+.container {
+    margin: 0 auto;
+}
+
+table {
+  width: 100%;
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+      padding: 5px;
+  }
+  th {
+    background-color: #bbb;
+  }
+
+/* -----------
+    BUTTON 
+-------------*/
+.btn {
+    position: relative;
+  
+    display: block;
+  
+    overflow: hidden;
+    padding: 10 15;
+  
+    border-width: 0;
+    outline: none;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .6);
+    
+    background-color: #2ecc71;
+    color: #ecf0f1;
+    
+    transition: background-color .3s;
+  }
+  
+  .btn:hover, .btn:focus {
+    background-color: #27ae60;
+  }
+  
+  .btn > * {
+    position: relative;
+  }
+  
+  .btn span {
+    display: block;
+    padding: 12px 24px;
+  }
+  
+  .btn:before {
+    content: "";
+    
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    
+    display: block;
+    width: 0;
+    padding-top: 0;
+      
+    border-radius: 100%;
+    
+    background-color: rgba(236, 240, 241, .3);
+    
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+  
+  .btn:active:before {
+    width: 120%;
+    padding-top: 120%;
+    
+    transition: width .2s ease-out, padding-top .2s ease-out;
+  }
+  
+  /* Styles, not important */
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+  
+  .btn.orange {
+    background-color: #e67e22;
+  }
+  
+  .btn.orange:hover, .btn.orange:focus {
+    background-color: #d35400;
+  }
+  
+  .btn.red {
+    background-color: #e74c3c;
+  }
+  
+  .btn.red:hover, .btn.red:focus {
+    background-color: #c0392b;
+  }
+
+
+
+
+  
+  
+  
+  /* navbar */
+  .navbar {
+    padding: 20px 0;
+    margin-bottom: 20px;
+    width: 100%;
+    height: auto;
+    background-color: #2196F3;
+  }
+  
+  .logo,
+  .nav {
+    display: inline-block;
+    margin: 0;
+  }
+  
+  /* nav links */
+  .nav {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .nav li {
+    display: inline-block;
+    margin-left: 40px;
+  }
+  
+  .navbar a {
+    color: #FFF;
+    text-decoration: none;
+  }
+  
+  .navbar a:hover {
+    color: #DDD;
+  }
+  
+  /* if you want pull right nav links */
+  .nav-right {
+    float: right;
+    line-height: 39px;
+  }
+  
+  
+  
+  /* responsive */
+  @media screen and (max-width: 677px) {
+    .container {
+      width: 80%;
+    }
+  }
+  
+  @media screen and (max-width: 767px) {
+    .container {
+      width: 90%;
+    }
+  }
+  
+  @media screen and (min-width: 768px) {
+    .container {
+      width: 750px;
+    }
+  }
+  
+  @media screen and (min-width: 992px) {
+    .container {
+      width: 960px;
+    }
+  }
+  
+  @media screen and (min-width: 1200px) {
+    .container {
+      width: 1170px;
+    }
+  }
+  
