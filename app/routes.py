@@ -1,26 +1,18 @@
 from app import app
 import mysql.connector as conn
 from app.config import config
+from app.dbClient import dbClient
+from flask import render_template
+from app.dataStructs import twitterAccountData
 
 
 @app.route('/')
-@app.route('/index')
-def index():
+@app.route('/home')
+def home():
 
-    og_conn = conn.connect(**config)
+    client = dbClient(config)
+    client.set_handle("@applejuice")
 
-    cursor = og_conn.cursor()
-    
-    # cursor.execute("insert into test values('testval2');")
-    # og_conn.commit()
+    twitter_account_data = twitterAccountData(client)
 
-    cursor.execute("SELECT * FROM test;")
-    
-    result = ""
-
-    for element in cursor:
-        result += element[0]
-
-    og_conn.close()
-
-    return result
+    return render_template("home.html", Overview=twitter_account_data)

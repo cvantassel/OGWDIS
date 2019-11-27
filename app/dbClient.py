@@ -8,21 +8,32 @@ class dbClient():
 
         self.og_conn = og_conn = conn.connect(**config)
         self.cursor = og_conn.cursor()
+    
+    def set_handle(self, handle):
+        self.handle = handle
+
+    def run_query(self, query):
+        response = self.cursor.execute(query)
+        result = []
+        for row in self.cursor:
+            result.append(row)
+        return result
+
 
     def run_multi_query(self, queries: list):
     
-    result = []
-    try:
-        responses = self.cursor.execute(query, multi=True)
-        self.og_conn.commit()
+        result = []
+        try:
+            responses = self.cursor.execute(query, multi=True)
+            self.og_conn.commit()
 
-        for response in responses:
-            for record in response:
-                result.append(record)
-        
-        return str(result)
-    except Exception as ex:
-        return str(ex)
+            for response in responses:
+                for record in response:
+                    result.append(record)
+            
+            return str(result)
+        except Exception as ex:
+            return str(ex)
 
     def run_get_data_procedure(self, proc_name:str, arguments:list):
         
@@ -40,6 +51,12 @@ class dbClient():
         
         except Exception as ex:
             print(ex)
+    
+    def get_follow_count(self)->int:
+        query = "select followers from twitterAccount where handle = '%s';" % (self.handle)
+        return self.run_query(query)[0][0]
+        
+
 
     def close_connection(self):
         self.og_conn.close()
