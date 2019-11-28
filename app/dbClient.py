@@ -1,5 +1,18 @@
 import mysql.connector as conn
 
+class Tweet():
+
+    def __init__(self, id, content = "", date = "", time = "", impact = "", favorites="", retweets="", replies="", link=""):
+        self.id = id
+        self.date = date
+        self.dateTime = time
+        self.content = content
+        self.impact = impact
+        self.favorites = favorites
+        self.retweets = retweets
+        self.replies = replies
+        self.link = link
+
 class dbClient():
     """https://dev.mysql.com/doc/connector-python/en/connector-python-reference.html"""
 
@@ -67,6 +80,14 @@ class dbClient():
             return count
         else:
             return 0
+
+    def get_tweet(self, tweetID:str)->Tweet:
+        query = """select tweetID, date, time, content, retweet, favorites, replies, link from tweet
+	                    where handle = '%s';""" % (self.handle)
+
+        tweet_data = self.run_query(query)[0]
+        
+        return Tweet(*tweet_data)
     
     def get_top_five_bad_words(self)->list:
         query = "select phrase from word order by badness DESC limit 5;"
@@ -166,16 +187,3 @@ class twitterAccountData():
         self.TweetCount = dbClient.get_tweet_count()
         self.AvgFollowRate = 0 #TODO
         self.ChangeFromLifetime = 0 #TODO
-
-class Tweet():
-
-    def __init__(self, id, content = "", date = "", time = "", impact = "", favorites="", retweets="", replies="", link=""):
-        self.id = id
-        self.date = date
-        self.dateTime = time
-        self.content = content
-        self.impact = impact
-        self.favorites = favorites
-        self.retweets = retweets
-        self.replies = replies
-        self.link = link

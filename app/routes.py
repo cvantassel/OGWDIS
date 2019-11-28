@@ -34,5 +34,15 @@ def history():
 
     return render_template("history.html", tweets=all_tweets)
 
+@app.route('/tweet/<string:tweetID>')
+def tweet(tweetID:str):
+
+    client = dbClient(config)
+    client.set_handle(HANDLE)
+
+    tweet = client.get_tweet(tweetID)
+
+    return render_template("tweet.html", tweet=tweet)
+
 
 
