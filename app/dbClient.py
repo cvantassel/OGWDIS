@@ -106,8 +106,30 @@ class dbClient():
             return count
         else:
             return 0
+    
+    def get_tweets_between_dates(self, start, end)->list:
+        query = """select tweetID, date, time, content, retweet, favorites, replies, link from tweet
+	                    where handle = '%s' and date between '%s' and '%s';""" % (self.handle, start, end)
+        
+        tweet_rows = self.run_query(query)
+        tweets = []
 
+        for row in tweet_rows:
+            tweets.append(Tweet(*row))
+        
+        return tweets
+    
+    def get_tweets_between_date_times(self, start, end)->list:
+        query = """select tweetID, date, time, content, retweet, favorites, replies, link from tweet
+	                    where handle = '%s' and time between '%s' and '%s';""" % (self.handle, start, end)
+        
+        tweet_rows = self.run_query(query)
+        tweets = []
 
+        for row in tweet_rows:
+            tweets.append(Tweet(*row))
+        
+        return tweets
 
 
     def get_top_five_tweets(self, descending = True)->list:
