@@ -14,7 +14,9 @@ def home():
 
     twitter_account_data = twitterAccountData(client)
     top_five_tweets = client.get_top_five_tweets(descending=True)
+    top_five_bad_words = client.get_top_five_bad_words()
 
     client.close_connection()
 
-    return render_template("home.html", Overview=twitter_account_data, tweets=top_five_tweets)
+    return render_template("home.html",
+     Overview=twitter_account_data, tweets=top_five_tweets, phrasesToAvoid=top_five_bad_words)

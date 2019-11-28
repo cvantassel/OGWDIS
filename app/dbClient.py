@@ -54,6 +54,16 @@ class dbClient():
     def get_follow_count(self)->int:
         query = "select followers from twitterAccount where handle = '%s';" % (self.handle)
         return self.run_query(query)[0][0]
+    
+    def get_top_five_bad_words(self)->list:
+        query = "select phrase from word order by badness DESC limit 5;"
+        bad_words = []
+        response = self.run_query(query)
+        for row in response:
+            bad_words.append(row[0])
+        return bad_words
+
+
 
     def get_top_five_tweets(self, descending = True)->list:
         if(descending):
