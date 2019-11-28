@@ -1,6 +1,5 @@
 import mysql.connector as conn
 
-
 class dbClient():
     """https://dev.mysql.com/doc/connector-python/en/connector-python-reference.html"""
 
@@ -55,8 +54,47 @@ class dbClient():
     def get_follow_count(self)->int:
         query = "select followers from twitterAccount where handle = '%s';" % (self.handle)
         return self.run_query(query)[0][0]
-        
 
+    def get_top_five_tweets(self, descending = True)->list:
+        if(descending):
+            order_by = 'DESC'
+        else:
+            order_by = 'ASC'
+
+        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, followEvent.gainOrLoss from tweet
+                        inner join followEvent on tweet.tweetID
+                        where tweet.handle = '%s'
+                        order by followEvent.gainOrLoss %s
+                        limit 5;""" % (self.handle, order_by)
+        
+        tweet_rows = self.run_query(query)
+
+        tweets = []
+
+        for row in tweet_rows:
+            tweets.append(Tweet(*row))
+        
+        return tweets
 
     def close_connection(self):
         self.og_conn.close()
+
+
+class twitterAccountData():
+
+    def __init__(self, dbClient:dbClient):
+        self.FollowCount = dbClient.get_follow_count()
+        self.UnfollowCount = 0 #TODO
+        self.NetFollowCount = abs(self.FollowCount - self.UnfollowCount)
+        self.TweetCount = 0 #TODO
+        self.AvgFollowRate = 0 #TODO
+        self.ChangeFromLifetime = 0 #TODO
+
+class Tweet():
+
+    def __init__(self, id, content = "", date = "", time = "", impact = ""):
+        self.id = id
+        self.date = date
+        self.dateTime = time
+        self.content = content
+        self.impact = impact

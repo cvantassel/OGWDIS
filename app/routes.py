@@ -1,9 +1,8 @@
 from app import app
 import mysql.connector as conn
 from app.config import config
-from app.dbClient import dbClient
+from app.dbClient import dbClient, twitterAccountData, Tweet
 from flask import render_template
-from app.dataStructs import twitterAccountData
 
 
 @app.route('/')
@@ -14,5 +13,8 @@ def home():
     client.set_handle("@applejuice")
 
     twitter_account_data = twitterAccountData(client)
+    top_five_tweets = client.get_top_five_tweets(descending=True)
 
-    return render_template("home.html", Overview=twitter_account_data)
+    client.close_connection()
+
+    return render_template("home.html", Overview=twitter_account_data, tweets=top_five_tweets)
