@@ -63,6 +63,29 @@ class dbClient():
             bad_words.append(row[0])
         return bad_words
 
+    def get_all_tweets(self, descending = True)->list:
+        if(descending):
+            order_by = 'DESC'
+        else:
+            order_by = 'ASC'
+        
+        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, 
+                        followEvent.gainOrLoss, tweet.favorites, tweet.retweet, tweet.replies, tweet.link
+                        from tweet
+                        inner join followEvent on tweet.tweetID
+                        where tweet.handle = '%s'
+                        order by followEvent.gainOrLoss %s
+                        """ % (self.handle, order_by)
+        tweet_rows = self.run_query(query)
+
+        tweets = []
+
+        for row in tweet_rows:
+            tweets.append(Tweet(*row))
+        
+        return tweets
+        
+
 
 
     def get_top_five_tweets(self, descending = True)->list:
@@ -102,9 +125,13 @@ class twitterAccountData():
 
 class Tweet():
 
-    def __init__(self, id, content = "", date = "", time = "", impact = ""):
+    def __init__(self, id, content = "", date = "", time = "", impact = "", favorites="", retweets="", replies="", link=""):
         self.id = id
         self.date = date
         self.dateTime = time
         self.content = content
         self.impact = impact
+        self.favorites = favorites
+        self.retweets = retweets
+        self.replies = replies
+        self.link = link
