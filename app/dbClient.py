@@ -53,7 +53,20 @@ class dbClient():
     
     def get_follow_count(self)->int:
         query = "select followers from twitterAccount where handle = '%s';" % (self.handle)
-        return self.run_query(query)[0][0]
+        count = self.run_query(query)[0][0]
+        if count is not None:
+            return count
+        else:
+            return 0
+    
+    def get_unfollow_count(self)->int:
+        query = """select SUM(gainOrLoss), associatedAccount from followEvent 
+        where gainOrLoss < 0 and associatedAccount = '%s';""" % (self.handle)
+        count = self.run_query(query)[0][0]
+        if count is not None:
+            return count
+        else:
+            return 0
     
     def get_top_five_bad_words(self)->list:
         query = "select phrase from word order by badness DESC limit 5;"
@@ -85,6 +98,15 @@ class dbClient():
         
         return tweets
         
+    
+    def get_tweet_count(self)->int:
+        query = "select COUNT(tweetID) from tweet where handle = '%s'" % (self.handle)
+        count = self.run_query(query)[0][0]
+        if count is not None:
+            return count
+        else:
+            return 0
+
 
 
 
@@ -117,9 +139,9 @@ class twitterAccountData():
 
     def __init__(self, dbClient:dbClient):
         self.FollowCount = dbClient.get_follow_count()
-        self.UnfollowCount = 0 #TODO
+        self.UnfollowCount = dbClient.get_unfollow_count()
         self.NetFollowCount = abs(self.FollowCount - self.UnfollowCount)
-        self.TweetCount = 0 #TODO
+        self.TweetCount = dbClient.get_tweet_count()
         self.AvgFollowRate = 0 #TODO
         self.ChangeFromLifetime = 0 #TODO
 
