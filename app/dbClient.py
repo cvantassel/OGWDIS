@@ -1,5 +1,12 @@
 import mysql.connector as conn
 
+'''
+# Query to get impact from individual tweets
+#SELECT
+    (SELECT COUNT(gainOrLoss) FROM followEvent WHERE associatedTweet = '%s' AND gainOrLoss = '1')
+  - (SELECT COUNT(gainOrLoss) FROM followEvent WHERE associatedTweet = '%s' AND gainOrLoss = '-1') AS Impact; % (self.tweetID)
+'''
+
 class Tweet():
 
     def __init__(self, id, content = "", date = "", time = "", impact = "", favorites="", retweets="", replies="", link=""):
@@ -210,7 +217,19 @@ class dbClient():
 
     def close_connection(self):
         self.og_conn.close()
+	
+ def lifetime_change(self, start, end) -> int: 
+        '''
+        should return lifetime change, just not sure where to get start/end to pass in call below
+        query = """select
+                        (select (count(*) from followEvent where associatedAccount = '%s' and gainOrLoss = '1' and (time between '%s' and '%s')
+                        - (select (count(*) from followEvent where associatedAccount = '%s' and gainOrLoss = '1' and (time between '%s' and '%s'))
+                        / (select followers from twitterAccount where handle = '%s') * 100;""" (self.handle, start, end, self.handle, start, end, self.handle)
 
+        rate = self.run_query(query)
+
+        return rate
+        '''
 
 class twitterAccountData():
 
@@ -220,4 +239,4 @@ class twitterAccountData():
         self.NetFollowCount = abs(self.FollowCount - self.UnfollowCount)
         self.TweetCount = dbClient.get_tweet_count()
         self.AvgFollowRate = 0 #TODO
-        self.ChangeFromLifetime = 0 #TODO
+        self.ChangeFromLifetime = 0 #TODO query/function is written, just need to call (pass start/end times)
