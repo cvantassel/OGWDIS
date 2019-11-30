@@ -217,11 +217,11 @@ class dbClient():
 
     def close_connection(self):
         self.og_conn.close()
-	
- def lifetime_change(self, start, end) -> int: 
-        '''
+'''	
+    def lifetime_change(self, start, end) -> int: 
+        
         should return lifetime change, just not sure where to get start/end to pass in call below
-        query = """select
+    	query = """select
                         (select (count(*) from followEvent where associatedAccount = '%s' and gainOrLoss = '1' and (time between '%s' and '%s')
                         - (select (count(*) from followEvent where associatedAccount = '%s' and gainOrLoss = '1' and (time between '%s' and '%s'))
                         / (select followers from twitterAccount where handle = '%s') * 100;""" (self.handle, start, end, self.handle, start, end, self.handle)
