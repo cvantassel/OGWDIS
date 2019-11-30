@@ -2,25 +2,44 @@ from app import app
 import mysql.connector as conn
 from app.config import config
 from app.dbClient import dbClient, twitterAccountData, Tweet
-from flask import render_template
+from flask import render_template, request
 
 HANDLE = "@applejuice"
 
 @app.route('/')
-@app.route('/home')
+@app.route('/home', methods = ['POST', 'GET'])
 def home():
 
-    client = dbClient(config)
-    client.set_handle(HANDLE)
+    if request.method == 'POST':
+        if request.form['posOrNeg'] == 'Positive':
+            is_descending = False
+        else:
+            is_descending = True
+        
+        client = dbClient(config)
+        client.set_handle(HANDLE)
 
-    twitter_account_data = twitterAccountData(client)
-    top_five_tweets = client.get_top_five_tweets(descending=True)
-    top_five_bad_words = client.get_top_five_bad_words()
+        twitter_account_data = twitterAccountData(client)
+        top_five_tweets = client.get_top_five_tweets(descending=is_descending)
+        top_five_bad_words = client.get_top_five_bad_words()
 
-    client.close_connection()
+        client.close_connection()
 
-    return render_template("home.html",
-     Overview=twitter_account_data, tweets=top_five_tweets, phrasesToAvoid=top_five_bad_words)
+        return render_template("home.html",
+            Overview=twitter_account_data, tweets=top_five_tweets, phrasesToAvoid=top_five_bad_words)
+    
+    else:
+        client = dbClient(config)
+        client.set_handle(HANDLE)
+
+        twitter_account_data = twitterAccountData(client)
+        top_five_tweets = client.get_top_five_tweets(descending=True)
+        top_five_bad_words = client.get_top_five_bad_words()
+
+        client.close_connection()
+
+        return render_template("home.html",
+        Overview=twitter_account_data, tweets=top_five_tweets, phrasesToAvoid=top_five_bad_words)
 
 @app.route('/history')
 def history():

@@ -20,8 +20,10 @@
                     <h2> Your Top Five</h2>
                     <div>
                         <span>Sort By:</span>
-                        <button>Negative</button> 
-                        <button>Positive</button>
+                        <form action = "/home" method="POST">
+                        <input type="submit" name="posOrNeg", value="Negative"/> 
+                        <input type="submit" name="posOrNeg", value="Positive"/>
+                        </form>
                         <select>
                             {% for window in timeWindows %}
                             <option value="{{ window.time }}">{{ window.time }}</option>
