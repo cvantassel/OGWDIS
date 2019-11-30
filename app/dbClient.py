@@ -125,6 +125,33 @@ class dbClient():
             tweets.append(Tweet(*row))
         
         return tweets
+
+    def get_tweets_with_keywords(self, keywords:list)->list:
+
+        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, followEvent.gainOrLoss, tweet.retweet, tweet.favorites, tweet.replies, tweet.link from tweet
+                inner join followEvent on tweet.tweetID
+                where tweet.handle = '%s'""" % (self.handle,)
+        
+        first_keyword = True
+
+        for keyword in keywords:
+
+            if first_keyword:
+                query += "\nAND tweet.content LIKE '%{}%'\n".format(keyword)
+                first_keyword = False
+            else:
+                query += "OR tweet.content LIKE '%{}%'\n".format(keyword)
+        
+        query += ";"
+
+        tweet_rows = self.run_query(query)
+
+        tweets = []
+
+        for row in tweet_rows:
+            tweets.append(Tweet(*row))
+        
+        return tweets
         
     
     def get_tweet_count(self)->int:

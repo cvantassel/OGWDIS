@@ -71,6 +71,24 @@ def history():
 
         return render_template("history.html", tweets=all_tweets)
 
+@app.route('/history-search', methods = ['POST'])
+def history_search():
+
+    if request.method == 'POST':
+        
+        keyword_text = request.form['keywords']
+        keywords = [word.strip() for word in keyword_text.split(",")]
+
+        client = dbClient(config)
+        client.set_handle(HANDLE)
+
+        
+        all_tweets = client.get_tweets_with_keywords(keywords)
+        
+        client.close_connection()
+
+        return render_template("history.html", tweets=all_tweets)
+
 @app.route('/tweet/<string:tweetID>')
 def tweet(tweetID:str):
 

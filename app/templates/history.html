@@ -19,8 +19,10 @@
                 <div class="homeContent">
                     <h2> Your Tweet History</h2>
                     <div style="text-align: center;">
-                        <input type="text" placeholder="Key, word, search"/>
-                        <button>Submit</button>
+                        <form action="/history-search" method="POST">
+                            <input type="text" name="keywords" placeholder="Key, word, search"/>
+                            <input type="submit", value="Search"/>
+                        </form>
                         <br/>
                         <span>Sort By:</span>
                         <form action= "/history" method= "POST">
