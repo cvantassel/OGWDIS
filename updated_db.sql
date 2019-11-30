@@ -126,6 +126,10 @@ INSERT INTO tweet VALUES (527, '@applejuice', '2019-08-29', '2019-08-29 11:15:21
 INSERT INTO tweet VALUES (621, '@livelaughlove', '2019-08-31', '2019-08-31 08:54:22', 'build that wall', 5, 9, 4, 'https://twitter.com/i/web/status/1982347582616289485921');
 INSERT INTO tweet VALUES (693, '@horsegirl', '2019-08-30', '2019-08-30 02:13:15', 'i love my cats', 22, 47, 11, 'https://twitter.com/i/web/status/2930580982714658693490');
 INSERT INTO tweet VALUES (732, '@twitch', '2019-08-30', '2019-08-30 03:39:22', 'can anyone give me a ride?', 1, 1, 2, 'https://twitter.com/i/web/status/23450629492034950');
+INSERT INTO tweet VALUES (319, '@egg620', '2019-09-01', '2019-09-01 11:48:52', 'i like eggs', 105, 21, 11, 'https://twitter.com/i/web/status/192983928129203021');
+INSERT INTO tweet VALUES (344, '@egg620', '2019-09-01', '2019-09-01 11:44:43', 'tom brady sucks', 122, 88, 24, 'https://twitter.com/i/web/status/199029292029298392');
+INSERT INTO tweet VALUES (519, '@egg620', '2019-09-01', '2019-09-01 12:28:39', 'real eyes realize real lies', 412, 202, 18, 'https://twitter.com/i/web/status/19289238029832991');
+INSERT INTO tweet VALUES (667, '@egg620', '2019-09-01', '2019-09-01 12:30:27', 'anyone want to play donkey konga 2?', 22, 99, 23, 'https://twitter.com/i/web/status/1902738219837473626');
 
 INSERT INTO followEvent VALUES (25, '@john392','2019-08-30', '2019-08-30 02:13:28', '1', 693, '@horsegirl');
 INSERT INTO followEvent VALUES (67, '@lilbreezy','2019-09-01', '2019-09-01 12:19:47', '-1', 489, '@egg620');
