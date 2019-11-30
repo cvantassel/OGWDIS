@@ -19,20 +19,25 @@
                 <div class="homeContent">
                     <h2> Your Tweet History</h2>
                     <div style="text-align: center;">
-                        <input type="text" placeholder="Key, word, search"/>
-                        <button>Submit</button>
+                        <form action="/history-search" method="POST">
+                            <input type="text" name="keywords" placeholder="Key, word, search"/>
+                            <input type="submit", value="Search"/>
+                        </form>
                         <br/>
                         <span>Sort By:</span>
-                        <button>Impact</button>
-                        <button>Favorites</button>
-                        <button>Reweets</button>
-                        <button>Replies</button>
-                        <select>
-                            {% for window in timeWindows %}
-                            <option value="{{ window.time }}">{{ window }}</option>
-                            {% endfor %}
-                        </select>
-                        <input type="checkbox"> Ascending </input>
+                        <form action= "/history" method= "POST">
+                            <input type="submit" name="sortBy", value= "Impact"/>
+                            <input type="submit" name="sortBy", value= "Favorites"/>
+                            <input type="submit" name="sortBy", value= "Retweets"/>
+                            <input type="submit" name="sortBy", value= "Replies"/>
+                            
+                            <select>
+                                {% for window in timeWindows %}
+                                <option value="{{ window.time }}">{{ window }}</option>
+                                {% endfor %}
+                            </select> 
+                            <input type="checkbox" name="ascending"> Ascending </input>
+                        </form>
 
                     </div>
                     <br/>
