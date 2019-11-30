@@ -41,17 +41,35 @@ def home():
         return render_template("home.html",
         Overview=twitter_account_data, tweets=top_five_tweets, phrasesToAvoid=top_five_bad_words)
 
-@app.route('/history')
+@app.route('/history', methods = ['POST', 'GET'])
 def history():
-    client = dbClient(config)
-    client.set_handle(HANDLE)
 
-    
-    all_tweets = client.get_all_tweets(descending=True)
-    
-    client.close_connection()
+    if request.method == 'POST':
+        if request.form.get('ascending'):
+            is_descending = False
+        else:
+            is_descending = True
+        
+        client = dbClient(config)
+        client.set_handle(HANDLE)
 
-    return render_template("history.html", tweets=all_tweets)
+        
+        all_tweets = client.get_tweets_by_x(request.form['sortBy'], is_descending)
+        
+        client.close_connection()
+
+        return render_template("history.html", tweets=all_tweets)
+    else:
+
+        client = dbClient(config)
+        client.set_handle(HANDLE)
+
+        
+        all_tweets = client.get_all_tweets(descending=True)
+        
+        client.close_connection()
+
+        return render_template("history.html", tweets=all_tweets)
 
 @app.route('/tweet/<string:tweetID>')
 def tweet(tweetID:str):

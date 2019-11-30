@@ -152,6 +152,40 @@ class dbClient():
         
         return tweets
 
+    def get_tweets_by_x(self, x:str, descending = True,):
+
+        if(descending):
+            order_by = 'DESC'
+        else:
+            order_by = 'ASC'
+
+        x = x.lower()
+        valid_tweet_sorts = ["favorites", "replies"]
+
+        if x == "impact":
+            x = "followEvent.gainOrLoss"
+        elif x in valid_tweet_sorts:
+            x = "tweet." + x
+        elif x == "retweets":
+            x = "tweet.retweet" #TODO: prolly should just rename this column
+        else:
+            return -1
+        
+        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, followEvent.gainOrLoss, tweet.retweet, tweet.favorites, tweet.replies, tweet.link from tweet
+                        inner join followEvent on tweet.tweetID
+                        where tweet.handle = '%s'
+                        order by %s %s
+                        limit 5;""" % (self.handle, x, order_by)
+        
+        tweet_rows = self.run_query(query)
+
+        tweets = []
+
+        for row in tweet_rows:
+            tweets.append(Tweet(*row))
+        
+        return tweets
+        
 
     def get_top_five_tweets(self, descending = True)->list:
         if(descending):
