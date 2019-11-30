@@ -4,7 +4,7 @@ from app.config import config
 from app.dbClient import dbClient, twitterAccountData, Tweet
 from flask import render_template, request
 
-HANDLE = "@applejuice"
+HANDLE = "@egg620"
 
 @app.route('/')
 @app.route('/home', methods = ['POST', 'GET'])
