@@ -4,6 +4,7 @@ CREATE TABLE ogAccount(
 email VARCHAR(320) NOT NULL,
 password VARCHAR(512) NOT NULL,
 defaultAccount VARCHAR(15),
+defaultWindow VARCHAR(20),
 PRIMARY KEY (email)
 );
 
@@ -21,8 +22,8 @@ durationStart TIMESTAMP NOT NULL, #split into two for ease of use,need to update
 durationEnd TIMESTAMP NOT NULL,
 associatedAccount VARCHAR(320) UNIQUE,
 followers INT NOT NULL,
-PRIMARY KEY (handle),
-FOREIGN KEY (associatedAccount) REFERENCES ogAccount (email)
+PRIMARY KEY (handle)
+-- , FOREIGN KEY (associatedAccount) REFERENCES ogAccount (email)
 );
 
 ALTER TABLE ogAccount ADD FOREIGN KEY (defaultAccount) REFERENCES twitterAccount(handle);
@@ -89,7 +90,6 @@ INSERT INTO ogAccount VALUES ('singh@yahoo.com', 'qwerty123!', '@twitch');
 INSERT INTO ogAccount VALUES ('grossman@gmail.com', '1q2w3e4r!', '@horsegirl');
 INSERT INTO ogAccount VALUES ('druschel@aol.com', 'myn00b#12', '@livelaughlove');
 INSERT INTO ogAccount VALUES ('nachbaur@msm.com', 'qwertyuiop.2', '@rick335');
-INSERT INTO ogAccount VALUES ('jwarren@icloud.com', '3rjs1laqe', '@footbal942');
 INSERT INTO ogAccount VALUES ('mschwartz@aol.com', 'maintain#3', '@siccskate');
 INSERT INTO ogAccount VALUES ('valdez@yahoo.com', 'password1!', '@walmart99');
 INSERT INTO ogAccount VALUES ('jesse@comcast.com', 'password2!', '@egg620');
@@ -112,7 +112,7 @@ INSERT INTO twitterAccount VALUES ('@twitch', 'singh@yahoo.com', 'qwerty123!', '
 INSERT INTO twitterAccount VALUES ('@horsegirl', 'gromanss@gmail.com', 'qwertyuiop.2', '2019-08-30 02:12:55', '2019-08-30 2:14:41', 'grossman@gmail.com', 364); 
 INSERT INTO twitterAccount VALUES ('@livelaughlove', 'dreul@yahoo.com', 'abcd.1234', '2019-08-31 08:39:52', '2019-09-01 9:03:32', 'druschel@aol.com', 356); 
 INSERT INTO twitterAccount VALUES ('@rick335', 'nefks@aol.com', 'user123!!', '2019-08-31 07:49:31', '2019-08-31 08:44:26', 'nachbaur@msm.com', 1176); 
-INSERT INTO twitterAccount VALUES ('@footbal942', 'jwarren@icloud', '3rjs1laqe', '2019-08-31 01:32:12', '2019-08-31 02:17:09', 'jwarren@icloud', 47); 
+INSERT INTO twitterAccount VALUES ('@footbal942', 'jwarren@icloud', '3rjs1laqe', '2019-08-31 01:32:12', '2019-08-31 02:17:09', 'eidac@att.net', 47); 
 INSERT INTO twitterAccount VALUES ('@siccskate', 'msw74@gmail.com', 'secure#12', '2019-08-31 03:08:32', '2019-08-31 03:10:45', 'mschwartz@aol.com', 532); 
 INSERT INTO twitterAccount VALUES ('@walmart99', 'valdez@yahoo.com', 'password1!', '2019-09-01 08:56:21', '2019-09-01 09:12:21', 'valdez@yahoo.com', 12); 
 INSERT INTO twitterAccount VALUES ('@egg620', 'jesse3@icloud.com', 'eggegg00!', '2019-09-01 11:17:23', '2019-09-01 12:32:49', 'jesse@comcast.com', 5890); 

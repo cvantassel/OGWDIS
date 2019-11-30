@@ -41,6 +41,9 @@ input {
     margin: 0 15px;
     flex-grow: 2;
 }
+#topFiveTable > tbody > tr > td{
+  padding: 25px;
+}
 
 .container {
     margin: 0 auto;

@@ -23,6 +23,8 @@ class dbClient():
     
     def set_handle(self, handle):
         self.handle = handle
+    def set_email(self, email):
+        self.email = email
 
     def run_query(self, query):
         response = self.cursor.execute(query)
@@ -104,7 +106,7 @@ class dbClient():
             order_by = 'ASC'
         
         query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, 
-                        followEvent.gainOrLoss, tweet.favorites, tweet.retweet, tweet.replies, tweet.link
+                        sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link
                         from tweet
                         inner join followEvent on tweet.tweetID
                         where tweet.handle = '%s'
@@ -159,7 +161,7 @@ class dbClient():
         else:
             order_by = 'ASC'
 
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, followEvent.gainOrLoss from tweet
+        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss) from tweet
                         inner join followEvent on tweet.tweetID
                         where tweet.handle = '%s'
                         order by followEvent.gainOrLoss %s
@@ -173,6 +175,18 @@ class dbClient():
             tweets.append(Tweet(*row))
         
         return tweets
+
+    def get_accounts(self)->list:
+        query = """select handle from twitterAccount where associatedAccount = "%s";""" % (self.email)
+        account_rows = self.run_query(query)
+
+        accounts = []
+
+        for row in account_rows:
+            accounts.append(row[0])
+        
+        return accounts
+
 
     def close_connection(self):
         self.og_conn.close()

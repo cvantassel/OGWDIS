@@ -17,26 +17,12 @@
             </nav>
             <div class="container" style="display: flex;justify-content: space-evenly;">
                 <div class="homeContent">
-                    <h1>Settings:</h1>
+                    <h1>Delete Account Confirmation:</h1>
                     <form method="POST" style="text-align: center;">
-                        <span>Default Twitter Account:</span>
-                        <select name="account">
-                            {% for account in accounts %}
-                            <option value="{{ account }}">{{ account }}</option>
-                            {% endfor %}
-                        </select>
-                        <br>
-                        <span>Adjust Tweet Association Window: </span>
-                        <select name="window">
-                            {% for window in tweetWindows %}
-                            <option value="{{ window }}">{{ window }}</option>
-                            {% endfor %}
-                        </select>
-                        <br>
-                        <button type="submit">Save Changes</button>
-                    <form>
-                    <p>{{ res }}</p>
+                        <span>Are you sure you'd like to delete your account?</span>
 
+                        <button type="submit">DELETE ACCOUNT</button>
+                    <form>
                 </div>
 
             </div>
