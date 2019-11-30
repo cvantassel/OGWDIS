@@ -117,6 +117,7 @@ INSERT INTO twitterAccount VALUES ('@siccskate', 'msw74@gmail.com', 'secure#12',
 INSERT INTO twitterAccount VALUES ('@walmart99', 'valdez@yahoo.com', 'password1!', '2019-09-01 08:56:21', '2019-09-01 09:12:21', 'valdez@yahoo.com', 12); 
 INSERT INTO twitterAccount VALUES ('@egg620', 'jesse3@icloud.com', 'eggegg00!', '2019-09-01 11:17:23', '2019-09-01 12:32:49', 'jesse@comcast.com', 5890); 
 
+
 INSERT INTO tweet VALUES (143, '@walmart99', '2019-09-01', '2019-09-01 09:03:29', 'I hate the Jonas Brothers', 1, 17, 3, 'https://twitter.com/i/web/status/1128357932238823424');
 INSERT INTO tweet VALUES (321, '@egg620', '2019-09-01', '2019-09-01 11:40:12', 'evil: every villain is lemons', 105, 137, 32, 'https://twitter.com/i/web/status/184890203945840293');
 INSERT INTO tweet VALUES (378, '@siccskate', '2019-08-31', '2019-08-31 03:09:43', 'retweet if you are my friend', 15, 3, 2, 'https://twitter.com/i/web/status/128394730239502935920');
@@ -139,8 +140,19 @@ INSERT INTO followEvent VALUES (152, '@jenna2112','2019-08-29', '2019-08-29 12:1
 INSERT INTO followEvent VALUES (179, '@breeanan','2019-08-31', '2019-08-31 09:02:36', '-1', 436, '@livelaughlove');
 INSERT INTO followEvent VALUES (201, '@jjorange','2019-09-01', '2019-09-01 11:56:17', '1', 321, '@egg620');
 INSERT INTO followEvent VALUES (217, '@hahioh','2019-09-01', '2019-09-01 09:08:50', '-1', 143, '@walmart99');
+INSERT INTO followEvent VALUES (63, '@drphil','2019-09-01', '2019-09-01 12:23:47', '1', 519, '@egg620');
+INSERT INTO followEvent VALUES (77, '@oprah','2019-09-01', '2019-09-01 11:55:22', '1', 519, '@egg620');
+INSERT INTO followEvent VALUES (89, '@ellen','2019-09-01', '2019-09-01 12:03:31', '-1', 519, '@egg620');
+INSERT INTO followEvent VALUES (90, '@josh','2019-09-01', '2019-09-01 12:14:43', '-1', 667, '@egg620');
+INSERT INTO followEvent VALUES (109, '@kyle','2019-09-01', '2019-09-01 11:36:11', '-1', 667, '@egg620');
 
-INSERT INTO follower VALUES ('@john392');
+drop table followEvent;
+
+INSERT INTO follower VALUES ('@drphil');
+INSERT INTO follower VALUES ('@oprah');
+INSERT INTO follower VALUES ('@ellen');
+INSERT INTO follower VALUES ('@josh');
+INSERT INTO follower VALUES ('@kyle');
 INSERT INTO follower VALUES ('@lilbreezy');
 INSERT INTO follower VALUES ('@yeehaw98');
 INSERT INTO follower VALUES ('@sarahbills');
@@ -166,6 +178,11 @@ INSERT INTO followedBy VALUES ('@jenna2112','@applejuice');
 INSERT INTO followedBy VALUES ('@breeanan','@livelaughlove');
 INSERT INTO followedBy VALUES ('@jjorange','@egg620');
 INSERT INTO followedBy VALUES ('@hahioh','@walmart99');
+INSERT INTO followedBy VALUES ('@drphil','@egg620');
+INSERT INTO followedBy VALUES ('@oprah','@egg620');
+INSERT INTO followedBy VALUES ('@ellen','@egg620');
+INSERT INTO followedBy VALUES ('@josh','@egg620');
+INSERT INTO followedBy VALUES ('@kyle','@egg620');
 
 INSERT INTO composedOf VALUES ('hate', 143);
 INSERT INTO composedOf VALUES ('evil', 321);
@@ -176,5 +193,3 @@ INSERT INTO composedOf VALUES ('war', 527);
 INSERT INTO composedOf VALUES ('wall', 621);
 INSERT INTO composedOf VALUES ('cats', 693);
 INSERT INTO composedOf VALUES ('ride', 732);
-
-#SELECT * from word;
