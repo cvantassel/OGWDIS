@@ -91,7 +91,7 @@ class dbClient():
         where gainOrLoss < 0 and associatedAccount = '%s';""" % (self.handle)
         count = self.run_query(query)[0][0]
         if count is not None:
-            return count
+            return int(count)
         else:
             return 0
 
@@ -120,10 +120,10 @@ class dbClient():
         query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, 
                         sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link
                         from tweet
-                        inner join followEvent on tweet.tweetID
+                        inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
-                        order by followEvent.gainOrLoss %s
+                        order by tweet.time %s
                         """ % (self.handle, order_by)
         tweet_rows = self.run_query(query)
 
@@ -137,7 +137,7 @@ class dbClient():
     def get_tweets_with_keywords(self, keywords:list)->list:
 
         query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
-                inner join followEvent on tweet.tweetID
+                inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                 where tweet.handle = '%s'""" % (self.handle,)
         
         first_keyword = True
@@ -214,7 +214,7 @@ class dbClient():
             return -1
         
         query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
-                        inner join followEvent on tweet.tweetID
+                        inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
                         order by %s %s""" % (self.handle, x, order_by)
@@ -236,7 +236,7 @@ class dbClient():
             order_by = 'ASC'
 
         query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss) as impact from tweet
-                        inner join followEvent on tweet.tweetID
+                        inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
                         order by impact %s
