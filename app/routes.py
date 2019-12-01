@@ -10,7 +10,8 @@ EMAIL = ""
 
 tweetWindows = ["hour", "day", "week"]
 
-@app.route('/home')
+
+@app.route('/home', methods = ['POST', 'GET'])
 def home():
     if (EMAIL == ""):
         return redirect("/login")
@@ -32,7 +33,7 @@ def home():
         client.close_connection()
 
         return render_template("home.html",
-            Overview=twitter_account_data, tweets=top_five_tweets, phrasesToAvoid=top_five_bad_words)
+            Overview=twitter_account_data, tweets=top_five_tweets, phrasesToAvoid=top_five_bad_words, tweetWindows=tweetWindows)
     
     else:
         client = dbClient(config)
@@ -45,7 +46,7 @@ def home():
         client.close_connection()
 
         return render_template("home.html",
-        Overview=twitter_account_data, tweets=top_five_tweets, phrasesToAvoid=top_five_bad_words)
+        Overview=twitter_account_data, tweets=top_five_tweets, phrasesToAvoid=top_five_bad_words, tweetWindows=tweetWindows)
 
 @app.route('/history', methods = ['POST', 'GET'])
 def history():
@@ -196,8 +197,8 @@ def signIntoAccount():
     password = request.form['password']
 
     checkPassword = client.run_query("select password from ogAccount where email = '" + email +"'")
-    checkPassword = checkPassword[0][0]
-    if password == checkPassword:
+    print(checkPassword)
+    if (checkPassword != []) & (password == checkPassword[0][0]):
         global EMAIL
         global HANDLE
         EMAIL = email

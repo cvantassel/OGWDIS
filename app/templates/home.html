@@ -25,9 +25,9 @@
                         <input type="submit" name="posOrNeg", value="Positive"/>
                         </form>
                         <select>
-                            {% for window in timeWindows %}
-                            <option value="{{ window.time }}">{{ window.time }}</option>
-                            {% endfor %}Smashmouth
+                            {% for window in tweetWindows %}
+                            <option value="{{ window }}">{{ window }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <br/>
