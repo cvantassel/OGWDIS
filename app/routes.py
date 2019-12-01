@@ -198,12 +198,13 @@ def signIntoAccount():
 
     checkPassword = client.run_query("select password from ogAccount where email = '" + email +"'")
     print(checkPassword)
-    if (checkPassword != []) & (password == checkPassword[0][0]):
-        global EMAIL
-        global HANDLE
-        EMAIL = email
-        HANDLE = client.run_query("select defaultAccount from ogAccount where email = '" + EMAIL +"'")
-        HANDLE = HANDLE[0][0]
-        return redirect("/home")
+    if (checkPassword != []):
+        if (password == checkPassword[0][0]):
+            global EMAIL
+            global HANDLE
+            EMAIL = email
+            HANDLE = client.run_query("select defaultAccount from ogAccount where email = '" + EMAIL +"'")
+            HANDLE = HANDLE[0][0]
+            return redirect("/home")
     else:
         return redirect("/login?error=" + "Invalid%20Account")
