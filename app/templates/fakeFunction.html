@@ -1,0 +1,44 @@
+<html> 
+    <head>
+            <link rel="stylesheet" href="../static/styles/style.css" type="text/css"/>
+
+        <link rel="stylesheet" href="{{ url_for('static',filename='styles/style.css') }}" type="text/css"/>
+    </head>
+    <body id="homeBody">
+            <nav class="navbar">
+                <div class="container">
+                    
+                    <h1 class="logo"><a href="#">OGWDIS</a></h1>
+                    <ul class="nav nav-right">
+                            <li><a href="home">Home</a></li>
+                            <li><a href="history">History</a></li>
+                            <li><a href="#">Settings</a></li>
+                            <li><a href="preferences">Preferences</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="container" style="display: flex;justify-content: space-evenly;">
+                <div class="homeContent">
+                    <h2>Fake Follower:</h2>
+                    <form method="POST">
+                        <label for="handle">Handle: </label><br/>
+                        <input type="text" name="handle" placeholder="Enter handle"/>
+                        <br/>
+                        <input type="radio" group="gainOrLoss" value="gain"> Gain
+                        <input type="radio" group="gainOrLoss" value="loss"> Loss
+                        <br/>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+                <div class="homeContent">
+                    <h2>Fake Tweet:</h2>
+                    <form method="POST">
+                        <label for="tweet">Tweet: </label><br/>
+                        <input type="text" name="tweet" placeholder="Enter Tweet"/>
+                        <br/>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>\
+    </body>
+</html>

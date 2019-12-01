@@ -32,8 +32,8 @@
                             <input type="submit" name="sortBy", value= "Replies"/>
                             
                             <select>
-                                {% for window in timeWindows %}
-                                <option value="{{ window.time }}">{{ window }}</option>
+                                {% for window in tweetWindows %}
+                                <option value="{{ window }}">{{ window }}</option>
                                 {% endfor %}
                             </select> 
                             <input type="checkbox" name="ascending"> Ascending </input>

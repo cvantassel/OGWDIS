@@ -245,3 +245,7 @@ def signUp():
         return redirect("/login")
     else:
         return redirect("/signup?error=" + "Passwords%20Don%27t%20Match")
+
+@app.route('/fakeFunction')
+def fakeFunction():
+    return render_template("fakeFunction.html")
