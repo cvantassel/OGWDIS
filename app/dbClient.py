@@ -96,7 +96,7 @@ class dbClient():
             return 0
 
     def get_tweet(self, tweetID:str)->Tweet:
-        query = """select tweetID, date, time, content, retweet, favorites, replies, link from tweet
+        query = """select tweetID, date, time, content, favorites, retweet, replies, link from tweet
 	                    where handle = '%s';""" % (self.handle)
 
         tweet_data = self.run_query(query)[0]
@@ -122,6 +122,7 @@ class dbClient():
                         from tweet
                         inner join followEvent on tweet.tweetID
                         where tweet.handle = '%s'
+                        group by tweet.tweetID
                         order by followEvent.gainOrLoss %s
                         """ % (self.handle, order_by)
         tweet_rows = self.run_query(query)
@@ -135,7 +136,7 @@ class dbClient():
 
     def get_tweets_with_keywords(self, keywords:list)->list:
 
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, followEvent.gainOrLoss, tweet.retweet, tweet.favorites, tweet.replies, tweet.link from tweet
+        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
                 inner join followEvent on tweet.tweetID
                 where tweet.handle = '%s'""" % (self.handle,)
         
@@ -149,7 +150,7 @@ class dbClient():
             else:
                 query += "OR tweet.content LIKE '%{}%'\n".format(keyword)
         
-        query += ";"
+        query += "group by tweet.tweetID;"
 
         tweet_rows = self.run_query(query)
 
@@ -170,7 +171,7 @@ class dbClient():
             return 0
     
     def get_tweets_between_dates(self, start, end)->list:
-        query = """select tweetID, date, time, content, retweet, favorites, replies, link from tweet
+        query = """select tweetID, date, time, content, favorites, retweet, replies, link from tweet
 	                    where handle = '%s' and date between '%s' and '%s';""" % (self.handle, start, end)
         
         tweet_rows = self.run_query(query)
@@ -182,7 +183,7 @@ class dbClient():
         return tweets
     
     def get_tweets_between_date_times(self, start, end)->list:
-        query = """select tweetID, date, time, content, retweet, favorites, replies, link from tweet
+        query = """select tweetID, date, time, content, favorites, retweet, replies, link from tweet
 	                    where handle = '%s' and time between '%s' and '%s';""" % (self.handle, start, end)
         
         tweet_rows = self.run_query(query)
@@ -212,11 +213,11 @@ class dbClient():
         else:
             return -1
         
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, followEvent.gainOrLoss, tweet.retweet, tweet.favorites, tweet.replies, tweet.link from tweet
+        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
                         inner join followEvent on tweet.tweetID
                         where tweet.handle = '%s'
-                        order by %s %s
-                        limit 5;""" % (self.handle, x, order_by)
+                        group by tweet.tweetID
+                        order by %s %s""" % (self.handle, x, order_by)
         
         tweet_rows = self.run_query(query)
 
@@ -234,10 +235,11 @@ class dbClient():
         else:
             order_by = 'ASC'
 
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss) from tweet
+        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss) as impact from tweet
                         inner join followEvent on tweet.tweetID
                         where tweet.handle = '%s'
-                        order by followEvent.gainOrLoss %s
+                        group by tweet.tweetID
+                        order by impact %s
                         limit 5;""" % (self.handle, order_by)
         
         tweet_rows = self.run_query(query)
