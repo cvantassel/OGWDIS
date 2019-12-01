@@ -30,11 +30,14 @@
                         <a href="{{ tweet.link }}">View Tweet</a>
                     </div>
                     <p>Temporarily Adjust Window: </p>
-                    <select>
+                    <form action = "/tweet/{{tweet.id}}" method="POST">
+                        <select name="temp_window">
                         {% for window in timeWindows %}
-                        <option value="{{ window.time }}">{{ window }}</option>
+                        <option value="{{ window }}">{{ window }}</option>
                         {% endfor %}
-                    </select>
+                        </select>
+                        <input type="submit" name="run_temp_window", value="Run"/>
+                    </form>
                     <hr/>
                     <br/>
                     <div style="display:flex;">

@@ -1,4 +1,5 @@
 import mysql.connector as conn
+from datetime import datetime, timedelta
 
 '''
 # Query to get impact from individual tweets
@@ -41,7 +42,12 @@ class dbClient():
         self.email = email
 
     def run_query(self, query):
-        response = self.cursor.execute(query)
+        try:
+            response = self.cursor.execute(query)
+        except Exception as ex:
+            print("THE FOLLOWING QUERY FAILED:", query)
+            print("WITH ERROR", str(ex))
+            return ex
         result = []
         for row in self.cursor:
             result.append(row)
@@ -118,6 +124,41 @@ class dbClient():
             unfollows.append(row[0])
         tweet.unfollows = unfollows
 
+    
+    def add_follow_data_to_tweet_with_new_window(self, tweet:Tweet, temp_window:str):
+
+        if temp_window == 'hour':
+            window_end = tweet.dateTime + timedelta(hours=1)
+        elif temp_window == 'day':
+            window_end = tweet.dateTime + timedelta(days=1)
+        elif temp_window == 'week':
+            window_end = tweet.dateTime + timedelta(weeks=1)
+        else:
+            return -1
+
+        get_follows_query = """ select associatedFollower from followEvent
+	                                inner join tweet on followEvent.associatedTweet = tweet.tweetID
+                                    where tweet.handle = '%s' and tweet.tweetID = %d and gainOrLoss > 0
+                                    and followEvent.time between '%s' and '%s';""" % (self.handle, tweet.id, tweet.dateTime, window_end)
+        
+        get_unfollows_query = """ select associatedFollower from followEvent
+	                                inner join tweet on followEvent.associatedTweet = tweet.tweetID
+                                    where tweet.handle = '%s' and tweet.tweetID = %d and gainOrLoss < 0
+                                    and followEvent.time between '%s' and '%s';""" % (self.handle, tweet.id, tweet.dateTime, window_end)
+        
+        follows = []
+        follow_results = self.run_query(get_follows_query)
+        for row in follow_results:
+            follows.append(row[0])
+        tweet.follows = follows
+
+        unfollows = []
+        unfollow_results = self.run_query(get_unfollows_query)
+        for row in unfollow_results:
+            unfollows.append(row[0])
+        tweet.unfollows = unfollows
+
+        tweet.impact = len(follows) - len(unfollows)
 
 
         

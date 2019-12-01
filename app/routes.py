@@ -96,16 +96,30 @@ def history_search():
 
         return render_template("history.html", tweets=all_tweets)
 
-@app.route('/tweet/<string:tweetID>')
+@app.route('/tweet/<string:tweetID>', methods = ['GET', 'POST'])
 def tweet(tweetID:str):
 
-    client = dbClient(config)
-    client.set_handle(HANDLE)
+    if request.method == 'POST':
 
-    tweet = client.get_tweet(tweetID)
-    client.add_follow_data_to_tweet(tweet)
+        temp_window = request.form['temp_window']
+        client = dbClient(config)
+        client.set_handle(HANDLE)
 
-    return render_template("tweet.html", tweet=tweet)
+        tweet = client.get_tweet(tweetID)
+        client.add_follow_data_to_tweet_with_new_window(tweet, temp_window)
+
+        return render_template("tweet.html", tweet=tweet, timeWindows=tweetWindows)
+
+
+    else:
+
+        client = dbClient(config)
+        client.set_handle(HANDLE)
+
+        tweet = client.get_tweet(tweetID)
+        client.add_follow_data_to_tweet(tweet)
+
+        return render_template("tweet.html", tweet=tweet, timeWindows=tweetWindows)
 
 @app.route('/settings')
 def settings():
