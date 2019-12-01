@@ -137,14 +137,12 @@ class dbClient():
             return -1
 
         get_follows_query = """ select associatedFollower from followEvent
-	                                inner join tweet on followEvent.associatedTweet = tweet.tweetID
-                                    where tweet.handle = '%s' and tweet.tweetID = %d and gainOrLoss > 0
-                                    and followEvent.time between '%s' and '%s';""" % (self.handle, tweet.id, tweet.dateTime, window_end)
+                                    where associatedAccount = '%s' and gainOrLoss > 0
+                                    and time between '%s' and '%s';""" % (self.handle, tweet.dateTime, window_end)
         
-        get_unfollows_query = """ select associatedFollower from followEvent
-	                                inner join tweet on followEvent.associatedTweet = tweet.tweetID
-                                    where tweet.handle = '%s' and tweet.tweetID = %d and gainOrLoss < 0
-                                    and followEvent.time between '%s' and '%s';""" % (self.handle, tweet.id, tweet.dateTime, window_end)
+        get_unfollows_query =  """ select associatedFollower from followEvent
+                                    where associatedAccount = '%s' and gainOrLoss < 0
+                                    and time between '%s' and '%s';""" % (self.handle, tweet.dateTime, window_end)
         
         follows = []
         follow_results = self.run_query(get_follows_query)

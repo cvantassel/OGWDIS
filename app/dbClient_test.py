@@ -16,24 +16,24 @@ class TestDbClient(unittest.TestCase):
             "INSERT INTO tweet VALUES (99991, '@test_handle', '2019-09-01', '2019-09-01 10:00:0', 'negative tweet boo', 2, 2, 2, 'https://twitter.com/i/web/status/1128357932238823425');",
             "INSERT INTO followEvent VALUES (88881, '@user1','2019-09-01', '2019-09-01 10:15:00', -1, 99991, '@test_handle');",
 
-            "INSERT INTO tweet VALUES (99992, '@test_handle', '2019-09-02', '2019-09-02 09:00:0', 'very positive tweet yay', 3, 3, 3, 'https://twitter.com/i/web/status/1128357932238823425');",
-            "INSERT INTO followEvent VALUES (88882, '@user2','2019-09-02', '2019-09-02 09:15:00', 1, 99992, '@test_handle');",
-            "INSERT INTO followEvent VALUES (88883, '@user3','2019-09-02', '2019-09-02 09:16:00', 1, 99992, '@test_handle');",
+            "INSERT INTO tweet VALUES (99992, '@test_handle', '2019-09-02', '2019-09-02 11:00:0', 'very positive tweet yay', 3, 3, 3, 'https://twitter.com/i/web/status/1128357932238823425');",
+            "INSERT INTO followEvent VALUES (88882, '@user2','2019-09-02', '2019-09-02 11:15:00', 1, 99992, '@test_handle');",
+            "INSERT INTO followEvent VALUES (88883, '@user3','2019-09-02', '2019-09-02 11:16:00', 1, 99992, '@test_handle');",
 
             
-            "INSERT INTO tweet VALUES (99993, '@test_handle', '2019-09-02', '2019-09-02 09:30:0', 'very negative tweet boo', 4, 4, 4, 'https://twitter.com/i/web/status/1128357932238823425');",
-            "INSERT INTO followEvent VALUES (88884, '@user4','2019-09-02', '2019-09-02 09:45:00', -1, 99993, '@test_handle');",
-            "INSERT INTO followEvent VALUES (88885, '@user5','2019-09-02', '2019-09-02 09:46:00', -1, 99993, '@test_handle');",
+            "INSERT INTO tweet VALUES (99993, '@test_handle', '2019-09-02', '2019-09-02 13:30:0', 'very negative tweet boo', 4, 4, 4, 'https://twitter.com/i/web/status/1128357932238823425');",
+            "INSERT INTO followEvent VALUES (88884, '@user4','2019-09-02', '2019-09-02 13:45:00', -1, 99993, '@test_handle');",
+            "INSERT INTO followEvent VALUES (88885, '@user5','2019-09-02', '2019-09-02 13:46:00', -1, 99993, '@test_handle');",
 
-            "INSERT INTO tweet VALUES (99994, '@test_handle', '2019-09-02', '2019-09-02 10:0:0', 'super duper negative tweet boo', 5, 5, 5, 'https://twitter.com/i/web/status/1128357932238823425');",
-            "INSERT INTO followEvent VALUES (88886, '@user6','2019-09-02', '2019-09-02 10:15:00', -1, 99994, '@test_handle');",
-            "INSERT INTO followEvent VALUES (88887, '@user7','2019-09-02', '2019-09-02 10:16:00', -1, 99994, '@test_handle');",
-            "INSERT INTO followEvent VALUES (88888, '@user8','2019-09-02', '2019-09-02 10:17:00', -1, 99994, '@test_handle');",
+            "INSERT INTO tweet VALUES (99994, '@test_handle', '2019-09-02', '2019-09-02 14:0:0', 'super duper negative tweet boo', 5, 5, 5, 'https://twitter.com/i/web/status/1128357932238823425');",
+            "INSERT INTO followEvent VALUES (88886, '@user6','2019-09-02', '2019-09-02 14:15:00', -1, 99994, '@test_handle');",
+            "INSERT INTO followEvent VALUES (88887, '@user7','2019-09-02', '2019-09-02 14:16:00', -1, 99994, '@test_handle');",
+            "INSERT INTO followEvent VALUES (88888, '@user8','2019-09-02', '2019-09-02 14:17:00', -1, 99994, '@test_handle');",
 
-            "INSERT INTO tweet VALUES (99995, '@test_handle', '2019-09-02', '2019-09-02 10:30:0', 'super duper positive tweet yay', 6, 6, 6, 'https://twitter.com/i/web/status/1128357932238823425');",
-            "INSERT INTO followEvent VALUES (88889, '@user9','2019-09-02', '2019-09-02 10:45:00', 1, 99995, '@test_handle');",
-            "INSERT INTO followEvent VALUES (88890, '@user10','2019-09-02', '2019-09-02 10:46:00', 1, 99995, '@test_handle');",
-            "INSERT INTO followEvent VALUES (88891, '@user11','2019-09-02', '2019-09-02 10:47:00', 1, 99995, '@test_handle');",
+            "INSERT INTO tweet VALUES (99995, '@test_handle', '2019-09-02', '2019-09-02 15:30:0', 'super duper positive tweet yay', 6, 6, 6, 'https://twitter.com/i/web/status/1128357932238823425');",
+            "INSERT INTO followEvent VALUES (88889, '@user9','2019-09-02', '2019-09-02 15:45:00', 1, 99995, '@test_handle');",
+            "INSERT INTO followEvent VALUES (88890, '@user10','2019-09-02', '2019-09-02 15:46:00', 1, 99995, '@test_handle');",
+            "INSERT INTO followEvent VALUES (88891, '@user11','2019-09-02', '2019-09-02 15:47:00', 1, 99995, '@test_handle');",
         ]
 
         self.client = dbClient(config)
@@ -156,6 +156,30 @@ class TestDbClient(unittest.TestCase):
 
         highest_value = 6
         self.assertEqual(results[0].replies, highest_value)
+    
+    def test_follower_data_with_temp_window_hour(self):
+
+        tweet = self.client.get_tweet('99990')
+        self.client.add_follow_data_to_tweet_with_new_window(tweet, 'hour')
+
+        new_followers = ['@user0']
+        new_unfollowers = []
+
+        self.assertEqual(tweet.follows, new_followers)
+        self.assertEqual(tweet.unfollows, new_unfollowers)
+
+    def test_follower_data_with_temp_window_day(self):
+
+        tweet = self.client.get_tweet('99990')
+        self.client.add_follow_data_to_tweet_with_new_window(tweet, 'day')
+
+        new_followers = ['@user0']
+        new_unfollowers = ['@user1']
+
+        self.assertEqual(tweet.follows, new_followers)
+        self.assertEqual(tweet.unfollows, new_unfollowers)
+
+        
 
 
 
