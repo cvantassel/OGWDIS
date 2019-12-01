@@ -190,6 +190,7 @@ def login():
     error = request.args.get('error', " ")
     return render_template("login.html", error=error)
 
+@app.route('/', methods=['POST'])
 @app.route('/login', methods=['POST'])
 def signIntoAccount():
     client = dbClient(config)
