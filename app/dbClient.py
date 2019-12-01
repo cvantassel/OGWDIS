@@ -338,7 +338,20 @@ class dbClient():
 
     def close_connection(self):
         self.og_conn.close()
-'''	
+	
+    def get_password(self):
+        return self.password
+
+    def set_password(self, input_password):
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(input_password, salt)
+        return hashed;
+
+    def check_password(self, input_password):
+        return bcrypt.checkpw(self.password, input_password)
+
+	
+'''
     def lifetime_change(self, start, end) -> int: 
         
         should return lifetime change, just not sure where to get start/end to pass in call below
