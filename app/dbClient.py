@@ -19,6 +19,11 @@ class Tweet():
         self.retweets = retweets
         self.replies = replies
         self.link = link
+    
+    def __repr__(self):
+        return "ID: " + str(self.id) + "\nTime: " + str(self.dateTime) + "\nBody: " + str(self.content) + "\nImpact: " + str(self.impact) + "\nFavorites: " + str(self.favorites) + "\nRetweets: " + str(self.retweets) + "\nReplies: " + str(self.replies) + "\nLink: " + str(self.link)
+    def __str__(self):
+        return "ID: " + str(self.id) + "\nTime: " + str(self.dateTime) + "\nBody: " + str(self.content) + "\nImpact: " + str(self.impact) + "\nFavorites: " + str(self.favorites) + "\nRetweets: " + str(self.retweets) + "\nReplies: " + str(self.replies) + "\nLink: " + str(self.link)
 
 class dbClient():
     """https://dev.mysql.com/doc/connector-python/en/connector-python-reference.html"""
