@@ -210,3 +210,24 @@ def signIntoAccount():
             return redirect("/home")
     else:
         return redirect("/login?error=" + "Invalid%20Account")
+    
+    @app.route('/signup')
+def signin():
+    error = request.args.get('error', " ")
+    return render_template("signup.html", error=error)
+
+
+@app.route('/signup', methods=['POST', 'GET'])
+def signUp():
+    client = dbClient(config)
+    email = request.form['email']
+    password = request.form['password']
+    check_pass = request.form['confirm password']
+    
+ #TODO get query to insert into table
+    if password == check_pass:
+        hashed = dbClient.set_password(password)
+        client.run_query("insert into ogAccount values('" + email + "', '" + hashed + "', NULL, 'hour');")
+        return redirect("/login")
+    else:
+        return redirect("/signup?error=" + "Passwords%20Don%27t%20Match")
