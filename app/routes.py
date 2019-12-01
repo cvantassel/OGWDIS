@@ -225,7 +225,7 @@ def signIntoAccount():
     else:
         return redirect("/login?error=" + "Invalid%20Account")
     
-    @app.route('/signup')
+@app.route('/signup')
 def signin():
     error = request.args.get('error', " ")
     return render_template("signup.html", error=error)
