@@ -19,6 +19,8 @@ class Tweet():
         self.retweets = retweets
         self.replies = replies
         self.link = link
+        self.follows = []
+        self.unfollows = []
     
     def __repr__(self):
         return "ID: " + str(self.id) + "\nTime: " + str(self.dateTime) + "\nBody: " + str(self.content) + "\nImpact: " + str(self.impact) + "\nFavorites: " + str(self.favorites) + "\nRetweets: " + str(self.retweets) + "\nReplies: " + str(self.replies) + "\nLink: " + str(self.link)
@@ -95,9 +97,39 @@ class dbClient():
         else:
             return 0
 
+    def add_follow_data_to_tweet(self, tweet:Tweet):
+        get_follows_query = """ select associatedFollower from followEvent
+	                                inner join tweet on followEvent.associatedTweet = tweet.tweetID
+                                    where tweet.handle = '%s' and tweet.tweetID = %d and gainOrLoss > 0;""" % (self.handle, tweet.id)
+        
+        get_unfollows_query = """ select associatedFollower from followEvent
+	                                inner join tweet on followEvent.associatedTweet = tweet.tweetID
+                                    where tweet.handle = '%s' and tweet.tweetID = %d and gainOrLoss < 0;""" % (self.handle, tweet.id)
+
+        follows = []
+        follow_results = self.run_query(get_follows_query)
+        for row in follow_results:
+            follows.append(row[0])
+        tweet.follows = follows
+
+        unfollows = []
+        unfollow_results = self.run_query(get_unfollows_query)
+        for row in unfollow_results:
+            unfollows.append(row[0])
+        tweet.unfollows = unfollows
+
+
+
+        
+
     def get_tweet(self, tweetID:str)->Tweet:
-        query = """select tweetID, date, time, content, favorites, retweet, replies, link from tweet
-	                    where handle = '%s';""" % (self.handle)
+        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, 
+                        sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link
+                        from tweet
+                        inner join followEvent on tweet.tweetID = followEvent.associatedTweet
+                        where tweet.handle = '%s' and tweet.tweetID = %s
+                        group by tweet.tweetID
+                        """ % (self.handle, tweetID)
 
         tweet_data = self.run_query(query)[0]
         

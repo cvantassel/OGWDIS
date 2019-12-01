@@ -103,6 +103,7 @@ def tweet(tweetID:str):
     client.set_handle(HANDLE)
 
     tweet = client.get_tweet(tweetID)
+    client.add_follow_data_to_tweet(tweet)
 
     return render_template("tweet.html", tweet=tweet)
 
