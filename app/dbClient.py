@@ -176,6 +176,20 @@ class dbClient():
         
         self.cursor.execute(insert_call, (follower_handle, now, gain_or_loss, associated_tweet_id, self.handle))
 
+
+        insert_call = """insert into follower (handle)
+                            values ('%s') ON DUPLICATE KEY UPDATE handle = handle ;""" % (follower_handle)
+        
+        self.cursor.execute(insert_call)
+
+
+        insert_call = """insert into followedBy (followerHandle, accountHandle)
+                            values (%s, %s) ON DUPLICATE KEY UPDATE followerHandle = followerHandle ;"""
+        
+        self.cursor.execute(insert_call, (follower_handle, self.handle))
+
+
+
         # Update Word Bank
         sign = ""
         if (gain_or_loss == "-1"):
