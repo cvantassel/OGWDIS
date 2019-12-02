@@ -189,7 +189,7 @@ class dbClient():
             query = """INSERT INTO word VALUES (%s, %s) ON DUPLICATE KEY UPDATE goodness = goodness """ + sign + """ 1 ;""" 
             self.cursor.execute(query, (word, gain_or_loss))
             # For each word, add it and its tweetID to the composedOf table
-            query = "INSERT INTO composedOf VALUES ('%s', %s)" % (word, associated_tweet_id)
+            query = "INSERT INTO composedOf VALUES ('%s', %s) ON DUPLICATE KEY UPDATE phrase = phrase" % (word, associated_tweet_id)
             self.cursor.execute(query)
         
         self.og_conn.commit()
