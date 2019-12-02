@@ -1,5 +1,6 @@
 import mysql.connector as conn
 from datetime import datetime, timedelta
+import bcrypt
 
 '''
 # Query to get impact from individual tweets
@@ -419,7 +420,19 @@ class dbClient():
     def check_password(self, input_password):
         return bcrypt.checkpw(self.password, input_password)
 
-	
+    '''def avg_follow_rate(self):
+
+        user = self.handle
+
+        query = """select (
+            (select count(*) from followEvent where associatedAccount = '%s' and gainOrLoss = '1')
+          - (select COUNT(*) from followEvent where associatedAccount = '%s' and gainOrLoss = '-1'))
+          / (select COUNT(*) from followEvent where associatedAccount = '%s') * 100;""" %(user, user, user)
+
+        rate = self.run_query(query)
+
+        return rate'''
+
 '''
     def lifetime_change(self, start, end) -> int: 
         
@@ -441,5 +454,5 @@ class twitterAccountData():
         self.UnfollowCount = dbClient.get_unfollow_count()
         self.NetFollowCount = abs(self.FollowCount - self.UnfollowCount)
         self.TweetCount = dbClient.get_tweet_count()
-        self.AvgFollowRate = 0 #TODO
+        self.AvgFollowRate = 0 #avg_follow_rate()
         self.ChangeFromLifetime = 0 #TODO query/function is written, just need to call (pass start/end times)
