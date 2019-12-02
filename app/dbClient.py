@@ -414,25 +414,23 @@ class dbClient():
     def set_password(self, input_password):
         salt = bcrypt.gensalt()
         hashed = bcrypt.hashpw(input_password, salt)
-        return hashed;
+        return hashed
 
     def check_password(self, input_password):
         return bcrypt.checkpw(self.password, input_password)
 
-	
-'''
-    def lifetime_change(self, start, end) -> int: 
-        
-        should return lifetime change, just not sure where to get start/end to pass in call below
-    	query = """select
-                        (select (count(*) from followEvent where associatedAccount = '%s' and gainOrLoss = '1' and (time between '%s' and '%s')
-                        - (select (count(*) from followEvent where associatedAccount = '%s' and gainOrLoss = '1' and (time between '%s' and '%s'))
-                        / (select followers from twitterAccount where handle = '%s') * 100;""" (self.handle, start, end, self.handle, start, end, self.handle)
+    def lifetime_change(self)->float: 
+        net_impact_query = """select sum(gainOrLoss) as impact from followEvent
+                                    where associatedAccount = '%s'""" % (self.handle)
 
-        rate = self.run_query(query)
+        total_follow_events_query = """select count(followEventID) from followEvent
+                                            where associatedAccount = '%s'""" % (self.handle)
 
-        return rate
-        '''
+
+        net_impact = self.run_query(net_impact_query)[0][0]
+        total_events = self.run_query(total_follow_events_query)[0][0]
+
+        return float(net_impact / total_events)
 
 class twitterAccountData():
 
@@ -441,5 +439,4 @@ class twitterAccountData():
         self.UnfollowCount = dbClient.get_unfollow_count()
         self.NetFollowCount = abs(self.FollowCount - self.UnfollowCount)
         self.TweetCount = dbClient.get_tweet_count()
-        self.AvgFollowRate = 0 #TODO
-        self.ChangeFromLifetime = 0 #TODO query/function is written, just need to call (pass start/end times)
+        self.AvgFollowRate = "{:.2f}".format(dbClient.lifetime_change())

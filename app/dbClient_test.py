@@ -191,6 +191,15 @@ class TestDbClient(unittest.TestCase):
         rows = self.client.run_query(get_follow_events_query)
 
         self.assertEqual(len(rows), 2)
+    
+    def test_get_avg_follow_rate(self):
+
+        query = "INSERT INTO followEvent VALUES (88892, '@user12','2019-09-02 15:47:00', 1, 99995, '@test_handle');"
+        self.client.run_query(query)
+
+        rate = self.client.lifetime_change()
+        self.assertEqual(rate, 1/13)
+    
 
 
         
