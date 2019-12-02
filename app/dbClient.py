@@ -10,9 +10,8 @@ from datetime import datetime, timedelta
 
 class Tweet():
 
-    def __init__(self, id, content = "", date = "", time = "", impact = "", favorites="", retweets="", replies="", link=""):
+    def __init__(self, id, content = "", time = "", impact = "", favorites="", retweets="", replies="", link=""):
         self.id = id
-        self.date = date
         self.dateTime = time
         self.content = content
         self.impact = impact
@@ -56,7 +55,7 @@ class dbClient():
     def run_insert_query(self, query):
         try:
             response = self.cursor.execute(query)
-            self.cursor.commit()
+            self.og_conn.commit()
         except Exception as ex:
             print("THE FOLLOWING QUERY FAILED:", query)
             print("WITH ERROR", str(ex))
@@ -135,6 +134,66 @@ class dbClient():
         for row in unfollow_results:
             unfollows.append(row[0])
         tweet.unfollows = unfollows
+    
+    def get_tweet_window(self)->str:
+        query = "select defaultWindow from ogAccount where email = '%s'" % (self.email)
+        resp = self.run_query(query)
+        return resp[0][0]
+
+    def handle_follow_event(self, follower_handle:str, gain_or_loss:int):
+        
+        tweet_window = self.get_tweet_window()
+
+        now = datetime.now()
+
+        if tweet_window == 'hour':
+            window_begin = now - timedelta(hours=1)
+        elif tweet_window == 'day':
+            window_begin = now - timedelta(days=1)
+        elif tweet_window == 'week':
+            window_begin = now - timedelta(weeks=1)
+        else:
+            raise Exception(tweet_window, "Is not a valid window")
+
+        find_last_associated_tweet_query = """select tweetID, content from tweet
+                                                    where handle = '%s'
+                                                    and datetime between '%s' and '%s'
+                                                    order by datetime desc;""" % (self.handle, window_begin, now)
+        
+        resp = self.run_query(find_last_associated_tweet_query)
+
+        # Create Follow Event
+        if(len(resp) == 0):
+            associated_tweet_id = None
+            associated_tweet_content = None
+        else:
+            associated_tweet_id = resp[0][0]
+            associated_tweet_content = resp[0][1]
+
+
+        insert_call = """insert into followEvent (associatedFollower, time, gainOrLoss, associatedTweet, associatedAccount)
+                            values (%s, %s, %s, %s, %s)"""
+        
+        self.cursor.execute(insert_call, (follower_handle, now, gain_or_loss, associated_tweet_id, self.handle))
+
+        # Update Word Bank
+        sign = ""
+        if (gain_or_loss == "-1"):
+            sign = "-"
+        else:
+            sign = "+"
+        
+        for word in associated_tweet_content.split(" "):
+            # For each word, upsert it and its goodness into the word table 
+            query = """INSERT INTO word VALUES (%s, %s) ON DUPLICATE KEY UPDATE goodness = goodness """ + sign + """ 1 ;""" 
+            self.cursor.execute(query, (word, gain_or_loss))
+            # For each word, add it and its tweetID to the composedOf table
+            query = "INSERT INTO composedOf VALUES ('%s', %s)" % (word, associated_tweet_id)
+            self.cursor.execute(query)
+        
+        self.og_conn.commit()
+
+
 
     
     def add_follow_data_to_tweet_with_new_window(self, tweet:Tweet, temp_window:str):
@@ -200,7 +259,7 @@ class dbClient():
         else:
             order_by = 'ASC'
         
-        query = """select tweet.tweetID, tweet.content,  tweet.datetime, 
+        query = """select tweet. tweetID, tweet.content,  tweet.datetime, 
                         sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link
                         from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet

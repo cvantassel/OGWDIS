@@ -12,3 +12,4 @@ app/__pycache__/dbClient.cpython-37.pyc
 app/__pycache__/routes.cpython-37.pyc
 app/playground.py
 app/__pycache__/dbClient_test.cpython-37.pyc
+tmp.sql

@@ -6,8 +6,8 @@ from flask import render_template, request, redirect
 import re
 import time    
 
-HANDLE = ""
-EMAIL = ""
+HANDLE = "@applejuice"
+EMAIL = "eidac@att.net"
 
 tweetWindows = ["hour", "day", "week"]
 
@@ -247,39 +247,26 @@ def signUp():
     else:
         return redirect("/signup?error=" + "Passwords%20Don%27t%20Match")
 
-@app.route('/fakeFunction', methods=['GET'])
+@app.route('/fakeFunction')
 def fakeFunction():
     return render_template("fakeFunction.html")
 
 
 @app.route('/fakeFunction', methods=['POST'])
 def fakeFunctionHandler():
-    client = dbClient(config)
-    tweet = request.form['tweet']
-    handle = request.form['handle']
 
-    if (tweet != ""):
+    client = dbClient(config)
+    client.set_handle(HANDLE)
+    client.set_email(EMAIL)
+
+    if 'tweet' in request.form:
+        tweet = request.form['tweet']
         currentTime = time.strftime('%Y-%m-%d %H:%M:%S')
         client.run_insert_query("insert into tweet (handle, content, datetime) values ('%s', '%s', '%s');" % (HANDLE, tweet, currentTime))
-    if (handle != ""):
-        #Get last tweet
-        tweet = "Temporary tweet"
-        tweetID = "1"
-        
-        gainOrLoss = "-1"
-        sign = ""
-        if (gainOrLoss == "-1"):
-            sign = "-"
-        else:
-            sign = "+"
 
-        for word in tweet.split(" "):
-            # For each word, upsert it and its goodness into the word table 
-            query = "INSERT INTO word VALUES ('%s',%s) ON DUPLICATE KEY SET goodness = goodness %s 1 ;" % (word, gainOrLoss, sign)
-            client.run_query(query)
-            # For each word, add it and its tweetID to the composedOf table
-            query = "INSERT INTO composedOf VALUES ('%s', %s)" % (word, tweetID)
+    if 'handle' in request.form:        
+        follower_handle = request.form['handle']
+        gain_or_loss = request.form['gainOrLoss']
+        client.handle_follow_event(follower_handle, gain_or_loss)
 
-
-
-    return redirect("/fakeFunction")
+    return render_template("fakeFunction.html") 
