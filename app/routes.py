@@ -144,7 +144,6 @@ def updateSettings():
     query = "update ogAccount set defaultAccount = '%s', defaultWindow = '%s' where email = '%s'" % (request.form['account'], request.form['window'], EMAIL)
     client.run_query(query)
 
-
     return redirect('/settings?res=' + 'Done!')
 
 
@@ -241,7 +240,7 @@ def signUp():
  #TODO get query to insert into table
     if password == check_pass:
         hashed = dbClient.set_password(password)
-        client.run_query("insert into ogAccount values('" + email + "', '" + hashed + "', NULL, 'hour');")
+        client.run_query("insert into ogAccount values('\'%s\'', '\'%s\'', NULL, 'hour')")
         return redirect("/login")
     else:
         return redirect("/signup?error=" + "Passwords%20Don%27t%20Match")
@@ -271,8 +270,5 @@ def fakeFunction():
             client.handle_follow_event(follower_handle,gain_or_loss)
 
             return render_template("fakeFunction.html")
-
-
-            
 
     return render_template("fakeFunction.html")
