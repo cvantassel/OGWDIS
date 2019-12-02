@@ -8,7 +8,7 @@ class TestDbClient(unittest.TestCase):
     def setUp(self):
         set_up_queries = [
             "INSERT INTO ogAccount VALUES ('tester@gmail.com', 'password1!', '@test_handle', 'hour');",
-            "INSERT INTO twitterAccount VALUES('@test_handle', 'tester@gmail.com', 'password1!', '2019-08-29 12:00:0', '2019-09-29 12:00:0', 'tester@gmail.com', 100);",
+            "INSERT INTO twitterAccount VALUES('@test_handle', 'tester@gmail.com', 'password1!', '2019-08-29 12:00:0', 'tester@gmail.com', 100);",
 
             "INSERT INTO tweet VALUES (99990, '@test_handle', '2019-09-01 09:00:0', 'positive tweet yay', 1, 1, 1, 'https://twitter.com/i/web/status/1128357932238823424');",
             "INSERT INTO followEvent VALUES (88880, '@user0', '2019-09-01 09:15:00', 1, 99990, '@test_handle');",
@@ -191,6 +191,15 @@ class TestDbClient(unittest.TestCase):
         rows = self.client.run_query(get_follow_events_query)
 
         self.assertEqual(len(rows), 2)
+    
+    def test_get_avg_follow_rate(self):
+
+        query = "INSERT INTO followEvent VALUES (88892, '@user12','2019-09-02 15:47:00', 1, 99995, '@test_handle');"
+        self.client.run_query(query)
+
+        rate = self.client.lifetime_change()
+        self.assertEqual(rate, 1/13)
+    
 
 
         
