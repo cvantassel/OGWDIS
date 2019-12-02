@@ -20,14 +20,14 @@
             <div class="container" style="display: flex;justify-content: space-evenly;">
                 <div class="homeContent">
                     <h2>Fake Follower:</h2>
-                    <form method="POST">
+                    <form action = "/fakeFunction" method="POST">
                         <label for="handle">Handle: </label><br/>
                         <input type="text" name="handle" placeholder="Enter handle"/>
                         <br/>
-                        <input type="radio" group="gainOrLoss" value="gain"> Gain
-                        <input type="radio" group="gainOrLoss" value="loss"> Loss
+                        <input type="radio" name="gainOrLoss" value="gain"> Gain
+                        <input type="radio" name="gainOrLoss" value="loss"> Loss
                         <br/>
-                        <button type="submit">Submit</button>
+                        <button type="submit" name="event" value="followEvent">Submit</button>
                     </form>
                 </div>
                 <div class="homeContent">

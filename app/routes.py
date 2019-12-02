@@ -246,6 +246,33 @@ def signUp():
     else:
         return redirect("/signup?error=" + "Passwords%20Don%27t%20Match")
 
-@app.route('/fakeFunction')
+@app.route('/fakeFunction', methods=['POST', 'GET'])
 def fakeFunction():
+
+    if request.method == 'POST':
+
+        client = dbClient(config)
+        client.set_handle(HANDLE)
+        client.set_email(EMAIL)
+
+        if request.form['event'] == "followEvent":
+            
+            
+            gain_or_loss = request.form['gainOrLoss']
+            if gain_or_loss == "gain":
+                gain_or_loss = 1
+            elif gain_or_loss == "loss":
+                gain_or_loss = -1
+            else:
+                raise Exception("Tried to create follow event with invalid data")
+            
+            follower_handle = request.form['handle']
+
+            client.handle_follow_event(follower_handle,gain_or_loss)
+
+            return render_template("fakeFunction.html")
+
+
+            
+
     return render_template("fakeFunction.html")

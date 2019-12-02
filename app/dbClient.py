@@ -10,9 +10,8 @@ from datetime import datetime, timedelta
 
 class Tweet():
 
-    def __init__(self, id, content = "", date = "", time = "", impact = "", favorites="", retweets="", replies="", link=""):
+    def __init__(self, id, content = "", time = "", impact = "", favorites="", retweets="", replies="", link=""):
         self.id = id
-        self.date = date
         self.dateTime = time
         self.content = content
         self.impact = impact
@@ -123,6 +122,44 @@ class dbClient():
         for row in unfollow_results:
             unfollows.append(row[0])
         tweet.unfollows = unfollows
+    
+    def get_tweet_window(self)->str:
+        query = "select defaultWindow from ogAccount where email = '%s'" % (self.email)
+        resp = self.run_query(query)
+        return resp[0][0]
+
+    def handle_follow_event(self, follower_handle:str, gain_or_loss:int):
+        
+        tweet_window = self.get_tweet_window()
+
+        now = datetime.now()
+
+        if tweet_window == 'hour':
+            window_begin = now - timedelta(hours=1)
+        elif tweet_window == 'day':
+            window_begin = now - timedelta(days=1)
+        elif tweet_window == 'week':
+            window_begin = now - timedelta(weeks=1)
+        else:
+            raise Exception(tweet_window, "Is not a valid window")
+
+        find_last_associated_tweet_query = """select tweetID from tweet
+                                                    where handle = '%s'
+                                                    and time between '%s' and '%s'
+                                                    order by time desc;""" % (self.handle, window_begin, now)
+        
+        resp = self.run_query(find_last_associated_tweet_query)
+        if(len(resp) == 0):
+            associated_tweet_id = None
+        else:
+            associated_tweet_id = resp[0][0]
+        
+        insert_call = """insert into followEvent (associatedFollower, time, gainOrLoss, associatedTweet, associatedAccount)
+                            values (%s, %s, %s, %s, %s)"""
+        
+        self.cursor.execute(insert_call, (follower_handle, now, gain_or_loss, associated_tweet_id, self.handle))
+
+
 
     
     def add_follow_data_to_tweet_with_new_window(self, tweet:Tweet, temp_window:str):
@@ -162,7 +199,7 @@ class dbClient():
         
 
     def get_tweet(self, tweetID:str)->Tweet:
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, 
+        query = """select tweet.tweetID, tweet.content, tweet.time, 
                         sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link
                         from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
@@ -188,7 +225,7 @@ class dbClient():
         else:
             order_by = 'ASC'
         
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, 
+        query = """select tweet.tweetID, tweet.content, tweet.time, 
                         sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link
                         from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
@@ -207,7 +244,7 @@ class dbClient():
 
     def get_tweets_with_keywords(self, keywords:list)->list:
 
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
+        query = """select tweet.tweetID, tweet.content, tweet.time, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
                 inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                 where tweet.handle = '%s'""" % (self.handle,)
         
@@ -284,7 +321,7 @@ class dbClient():
         else:
             return -1
         
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
+        query = """select tweet.tweetID, tweet.content, tweet.time, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
@@ -306,7 +343,7 @@ class dbClient():
         else:
             order_by = 'ASC'
 
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss) as impact from tweet
+        query = """select tweet.tweetID, tweet.content, tweet.time, sum(followEvent.gainOrLoss) as impact from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
