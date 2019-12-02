@@ -53,6 +53,18 @@ class dbClient():
             result.append(row)
         return result
 
+    def run_insert_query(self, query):
+        try:
+            response = self.cursor.execute(query)
+            self.cursor.commit()
+        except Exception as ex:
+            print("THE FOLLOWING QUERY FAILED:", query)
+            print("WITH ERROR", str(ex))
+            return ex
+        result = []
+        for row in self.cursor:
+            result.append(row)
+        return result
 
     def run_multi_query(self, queries: list):
     
@@ -162,7 +174,7 @@ class dbClient():
         
 
     def get_tweet(self, tweetID:str)->Tweet:
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, 
+        query = """select tweet.tweetID, tweet.content,  tweet.datetime, 
                         sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link
                         from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
@@ -175,7 +187,7 @@ class dbClient():
         return Tweet(*tweet_data)
     
     def get_top_five_bad_words(self)->list:
-        query = "select phrase from word order by badness DESC limit 5;"
+        query = "select phrase from word order by goodness DESC limit 5;"
         bad_words = []
         response = self.run_query(query)
         for row in response:
@@ -188,13 +200,13 @@ class dbClient():
         else:
             order_by = 'ASC'
         
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, 
+        query = """select tweet.tweetID, tweet.content,  tweet.datetime, 
                         sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link
                         from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
-                        order by tweet.time %s
+                        order by tweet.datetime %s
                         """ % (self.handle, order_by)
         tweet_rows = self.run_query(query)
 
@@ -207,7 +219,7 @@ class dbClient():
 
     def get_tweets_with_keywords(self, keywords:list)->list:
 
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
+        query = """select tweet.tweetID, tweet.content,  tweet.datetime, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
                 inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                 where tweet.handle = '%s'""" % (self.handle,)
         
@@ -284,7 +296,7 @@ class dbClient():
         else:
             return -1
         
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
+        query = """select tweet.tweetID, tweet.content,  tweet.datetime, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
@@ -306,7 +318,7 @@ class dbClient():
         else:
             order_by = 'ASC'
 
-        query = """select tweet.tweetID, tweet.content, tweet.date, tweet.time, sum(followEvent.gainOrLoss) as impact from tweet
+        query = """select tweet.tweetID, tweet.content,  tweet.datetime, sum(followEvent.gainOrLoss) as impact from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
