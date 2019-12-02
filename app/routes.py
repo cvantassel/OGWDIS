@@ -7,7 +7,7 @@ from flask import render_template, request, redirect
 import hashlib
 
 
-from app import app, hashing
+from app import app
 from app.config import config
 from app.dbClient import dbClient, twitterAccountData
 
@@ -269,7 +269,9 @@ def signUp():
     hashed = str(hashed)
 
     if password == check_pass:
-        query = '''insert into ogAccount values ("{0}", "{1}", NULL, 'hour');'''.format(email, hashed)
+        default_handle = "@default_handle"
+        client.create_twitter_account(default_handle, email, hashed, email) #TODO: Change with api integration
+        query = '''insert into ogAccount values ("{0}", "{1}", "{2}", 'hour');'''.format(email, hashed, default_handle)
         client.run_insert_query(query)
         return redirect("/login")
     else:

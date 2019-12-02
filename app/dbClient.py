@@ -338,6 +338,10 @@ class dbClient():
         
         return tweets
     
+    def create_twitter_account(self, handle, twitter_email, password, og_email, followers= 100):
+        query = """INSERT INTO twitterAccount VALUES ('%s', '%s', '%s', '%s', '%s', %d);""" % (handle, twitter_email, password, datetime.now() , og_email, followers)
+        self.run_insert_query(query)
+    
     def get_tweets_between_date_times(self, start, end)->list:
         query = """select tweetID, date, time, content, favorites, retweet, replies, link from tweet
 	                    where handle = '%s' and time between '%s' and '%s';""" % (self.handle, start, end)
