@@ -445,8 +445,22 @@ class dbClient():
                                             where associatedAccount = '%s'""" % (self.handle)
 
 
-        net_impact = self.run_query(net_impact_query)[0][0]
-        total_events = self.run_query(total_follow_events_query)[0][0]
+        resp = self.run_query(total_follow_events_query)
+        if(len(resp) == 0):
+            return 0
+        else:
+            total_events = resp[0][0]
+            if total_events == 0:
+                return 0.0
+
+        resp = self.run_query(net_impact_query)
+        if(len(resp) == 0):
+            net_impact = 0
+        else:
+            net_impact = resp[0][0]
+            if net_impact is None:
+                net_impact = 0.0
+
 
         return float(net_impact / total_events)
 
