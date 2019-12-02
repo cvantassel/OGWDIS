@@ -20,12 +20,12 @@
             <div class="container" style="display: flex;justify-content: space-evenly;">
                 <div class="homeContent">
                     <h2>Fake Follower:</h2>
-                    <form action = "/fakeFunction" method="POST">
+                    <form method="POST">
                         <label for="handle">Handle: </label><br/>
                         <input type="text" name="handle" placeholder="Enter handle"/>
                         <br/>
-                        <input type="radio" name="gainOrLoss" value="gain"> Gain
-                        <input type="radio" name="gainOrLoss" value="loss"> Loss
+                        <input type="radio" name="gainOrLoss" value="1" checked> Gain
+                        <input type="radio" name="gainOrLoss" value="-1"> Loss
                         <br/>
                         <button type="submit" name="event" value="followEvent">Submit</button>
                     </form>
@@ -34,7 +34,7 @@
                     <h2>Fake Tweet:</h2>
                     <form method="POST">
                         <label for="tweet">Tweet: </label><br/>
-                        <input type="text" name="tweet" placeholder="Enter Tweet"/>
+                        <input type="text" name="tweet" placeholder="Enter Tweet:"/><br/>
                         <br/>
                         <button type="submit">Submit</button>
                     </form>

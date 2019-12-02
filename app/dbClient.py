@@ -1,7 +1,5 @@
 import mysql.connector as conn
 from datetime import datetime, timedelta
-import bcrypt
-
 
 '''
 # Query to get impact from individual tweets
@@ -10,10 +8,9 @@ import bcrypt
   - (SELECT COUNT(gainOrLoss) FROM followEvent WHERE associatedTweet = '%s' AND gainOrLoss = '-1') AS Impact; % (self.tweetID)
 '''
 
-
 class Tweet():
 
-    def __init__(self, id, content="", time="", impact="", favorites="", retweets="", replies="", link=""):
+    def __init__(self, id, content = "", time = "", impact = "", favorites="", retweets="", replies="", link=""):
         self.id = id
         self.dateTime = time
         self.content = content
@@ -24,31 +21,22 @@ class Tweet():
         self.link = link
         self.follows = []
         self.unfollows = []
-
+    
     def __repr__(self):
-        return "ID: " + str(self.id) + "\nTime: " + str(self.dateTime) + "\nBody: " + str(
-            self.content) + "\nImpact: " + str(self.impact) + "\nFavorites: " + str(
-            self.favorites) + "\nRetweets: " + str(self.retweets) + "\nReplies: " + str(
-            self.replies) + "\nLink: " + str(self.link)
-
+        return "ID: " + str(self.id) + "\nTime: " + str(self.dateTime) + "\nBody: " + str(self.content) + "\nImpact: " + str(self.impact) + "\nFavorites: " + str(self.favorites) + "\nRetweets: " + str(self.retweets) + "\nReplies: " + str(self.replies) + "\nLink: " + str(self.link)
     def __str__(self):
-        return "ID: " + str(self.id) + "\nTime: " + str(self.dateTime) + "\nBody: " + str(
-            self.content) + "\nImpact: " + str(self.impact) + "\nFavorites: " + str(
-            self.favorites) + "\nRetweets: " + str(self.retweets) + "\nReplies: " + str(
-            self.replies) + "\nLink: " + str(self.link)
-
+        return "ID: " + str(self.id) + "\nTime: " + str(self.dateTime) + "\nBody: " + str(self.content) + "\nImpact: " + str(self.impact) + "\nFavorites: " + str(self.favorites) + "\nRetweets: " + str(self.retweets) + "\nReplies: " + str(self.replies) + "\nLink: " + str(self.link)
 
 class dbClient():
     """https://dev.mysql.com/doc/connector-python/en/connector-python-reference.html"""
 
-    def __init__(self, config: dict):
+    def __init__(self, config:dict):
 
         self.og_conn = og_conn = conn.connect(**config)
         self.cursor = og_conn.cursor()
-
+    
     def set_handle(self, handle):
         self.handle = handle
-
     def set_email(self, email):
         self.email = email
 
@@ -64,8 +52,21 @@ class dbClient():
             result.append(row)
         return result
 
-    def run_multi_query(self, queries: list):
+    def run_insert_query(self, query):
+        try:
+            response = self.cursor.execute(query)
+            self.og_conn.commit()
+        except Exception as ex:
+            print("THE FOLLOWING QUERY FAILED:", query)
+            print("WITH ERROR", str(ex))
+            return ex
+        result = []
+        for row in self.cursor:
+            result.append(row)
+        return result
 
+    def run_multi_query(self, queries: list):
+    
         result = []
         try:
             responses = self.cursor.execute(query, multi=True)
@@ -74,15 +75,15 @@ class dbClient():
             for response in responses:
                 for record in response:
                     result.append(record)
-
+            
             return str(result)
         except Exception as ex:
             return str(ex)
 
-    def run_get_data_procedure(self, proc_name: str, arguments: list):
-
+    def run_get_data_procedure(self, proc_name:str, arguments:list):
+        
         result = []
-
+        
         try:
             self.cursor.callproc(proc_name, [username])
             self.og_conn.commit()
@@ -90,21 +91,21 @@ class dbClient():
             for response in self.cursor.stored_results():
                 for record in response.fetchall():
                     result.append(str(record))
-
+            
             return result
-
+        
         except Exception as ex:
             print(ex)
-
-    def get_follow_count(self) -> int:
+    
+    def get_follow_count(self)->int:
         query = "select followers from twitterAccount where handle = '%s';" % (self.handle)
         count = self.run_query(query)[0][0]
         if count is not None:
             return count
         else:
             return 0
-
-    def get_unfollow_count(self) -> int:
+    
+    def get_unfollow_count(self)->int:
         query = """select SUM(gainOrLoss), associatedAccount from followEvent 
         where gainOrLoss < 0 and associatedAccount = '%s';""" % (self.handle)
         count = self.run_query(query)[0][0]
@@ -113,16 +114,14 @@ class dbClient():
         else:
             return 0
 
-    def add_follow_data_to_tweet(self, tweet: Tweet):
+    def add_follow_data_to_tweet(self, tweet:Tweet):
         get_follows_query = """ select associatedFollower from followEvent
 	                                inner join tweet on followEvent.associatedTweet = tweet.tweetID
-                                    where tweet.handle = '%s' and tweet.tweetID = %d and gainOrLoss > 0;""" % (
-        self.handle, tweet.id)
-
+                                    where tweet.handle = '%s' and tweet.tweetID = %d and gainOrLoss > 0;""" % (self.handle, tweet.id)
+        
         get_unfollows_query = """ select associatedFollower from followEvent
 	                                inner join tweet on followEvent.associatedTweet = tweet.tweetID
-                                    where tweet.handle = '%s' and tweet.tweetID = %d and gainOrLoss < 0;""" % (
-        self.handle, tweet.id)
+                                    where tweet.handle = '%s' and tweet.tweetID = %d and gainOrLoss < 0;""" % (self.handle, tweet.id)
 
         follows = []
         follow_results = self.run_query(get_follows_query)
@@ -135,14 +134,14 @@ class dbClient():
         for row in unfollow_results:
             unfollows.append(row[0])
         tweet.unfollows = unfollows
-
-    def get_tweet_window(self) -> str:
+    
+    def get_tweet_window(self)->str:
         query = "select defaultWindow from ogAccount where email = '%s'" % (self.email)
         resp = self.run_query(query)
         return resp[0][0]
 
-    def handle_follow_event(self, follower_handle: str, gain_or_loss: int):
-
+    def handle_follow_event(self, follower_handle:str, gain_or_loss:int):
+        
         tweet_window = self.get_tweet_window()
 
         now = datetime.now()
@@ -156,23 +155,48 @@ class dbClient():
         else:
             raise Exception(tweet_window, "Is not a valid window")
 
-        find_last_associated_tweet_query = """select tweetID from tweet
+        find_last_associated_tweet_query = """select tweetID, content from tweet
                                                     where handle = '%s'
-                                                    and time between '%s' and '%s'
-                                                    order by time desc;""" % (self.handle, window_begin, now)
-
+                                                    and datetime between '%s' and '%s'
+                                                    order by datetime desc;""" % (self.handle, window_begin, now)
+        
         resp = self.run_query(find_last_associated_tweet_query)
-        if (len(resp) == 0):
+
+        # Create Follow Event
+        if(len(resp) == 0):
             associated_tweet_id = None
+            associated_tweet_content = None
         else:
             associated_tweet_id = resp[0][0]
+            associated_tweet_content = resp[0][1]
+
 
         insert_call = """insert into followEvent (associatedFollower, time, gainOrLoss, associatedTweet, associatedAccount)
                             values (%s, %s, %s, %s, %s)"""
-
+        
         self.cursor.execute(insert_call, (follower_handle, now, gain_or_loss, associated_tweet_id, self.handle))
 
-    def add_follow_data_to_tweet_with_new_window(self, tweet: Tweet, temp_window: str):
+        # Update Word Bank
+        sign = ""
+        if (gain_or_loss == "-1"):
+            sign = "-"
+        else:
+            sign = "+"
+        
+        for word in associated_tweet_content.split(" "):
+            # For each word, upsert it and its goodness into the word table 
+            query = """INSERT INTO word VALUES (%s, %s) ON DUPLICATE KEY UPDATE goodness = goodness """ + sign + """ 1 ;""" 
+            self.cursor.execute(query, (word, gain_or_loss))
+            # For each word, add it and its tweetID to the composedOf table
+            query = "INSERT INTO composedOf VALUES ('%s', %s)" % (word, associated_tweet_id)
+            self.cursor.execute(query)
+        
+        self.og_conn.commit()
+
+
+
+    
+    def add_follow_data_to_tweet_with_new_window(self, tweet:Tweet, temp_window:str):
 
         if temp_window == 'hour':
             window_end = tweet.dateTime + timedelta(hours=1)
@@ -186,11 +210,11 @@ class dbClient():
         get_follows_query = """ select associatedFollower from followEvent
                                     where associatedAccount = '%s' and gainOrLoss > 0
                                     and time between '%s' and '%s';""" % (self.handle, tweet.dateTime, window_end)
-
-        get_unfollows_query = """ select associatedFollower from followEvent
+        
+        get_unfollows_query =  """ select associatedFollower from followEvent
                                     where associatedAccount = '%s' and gainOrLoss < 0
                                     and time between '%s' and '%s';""" % (self.handle, tweet.dateTime, window_end)
-
+        
         follows = []
         follow_results = self.run_query(get_follows_query)
         for row in follow_results:
@@ -205,8 +229,11 @@ class dbClient():
 
         tweet.impact = len(follows) - len(unfollows)
 
-    def get_tweet(self, tweetID: str) -> Tweet:
-        query = """select tweet.tweetID, tweet.content, tweet.dateTime, 
+
+        
+
+    def get_tweet(self, tweetID:str)->Tweet:
+        query = """select tweet.tweetID, tweet.content,  tweet.datetime, 
                         sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link
                         from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
@@ -215,10 +242,10 @@ class dbClient():
                         """ % (self.handle, tweetID)
 
         tweet_data = self.run_query(query)[0]
-
+        
         return Tweet(*tweet_data)
-
-    def get_top_five_bad_words(self) -> list:
+    
+    def get_top_five_bad_words(self)->list:
         query = "select phrase from word order by goodness DESC limit 5;"
         bad_words = []
         response = self.run_query(query)
@@ -226,19 +253,19 @@ class dbClient():
             bad_words.append(row[0])
         return bad_words
 
-    def get_all_tweets(self, descending=True) -> list:
-        if (descending):
+    def get_all_tweets(self, descending = True)->list:
+        if(descending):
             order_by = 'DESC'
         else:
             order_by = 'ASC'
-
-        query = """select tweet.tweetID, tweet.content, tweet.dateTime, 
+        
+        query = """select tweet. tweetID, tweet.content,  tweet.datetime, 
                         sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link
                         from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
-                        order by tweet.dateTime %s
+                        order by tweet.datetime %s
                         """ % (self.handle, order_by)
         tweet_rows = self.run_query(query)
 
@@ -246,15 +273,15 @@ class dbClient():
 
         for row in tweet_rows:
             tweets.append(Tweet(*row))
-
+        
         return tweets
 
-    def get_tweets_with_keywords(self, keywords: list) -> list:
+    def get_tweets_with_keywords(self, keywords:list)->list:
 
-        query = """select tweet.tweetID, tweet.content, tweet.dateTime, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
+        query = """select tweet.tweetID, tweet.content,  tweet.datetime, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
                 inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                 where tweet.handle = '%s'""" % (self.handle,)
-
+        
         first_keyword = True
 
         for keyword in keywords:
@@ -264,7 +291,7 @@ class dbClient():
                 first_keyword = False
             else:
                 query += "OR tweet.content LIKE '%{}%'\n".format(keyword)
-
+        
         query += "group by tweet.tweetID;"
 
         tweet_rows = self.run_query(query)
@@ -273,44 +300,45 @@ class dbClient():
 
         for row in tweet_rows:
             tweets.append(Tweet(*row))
-
+        
         return tweets
-
-    def get_tweet_count(self) -> int:
+        
+    
+    def get_tweet_count(self)->int:
         query = "select COUNT(tweetID) from tweet where handle = '%s'" % (self.handle)
         count = self.run_query(query)[0][0]
         if count is not None:
             return count
         else:
             return 0
-
-    def get_tweets_between_dates(self, start, end) -> list:
+    
+    def get_tweets_between_dates(self, start, end)->list:
         query = """select tweetID, date, time, content, favorites, retweet, replies, link from tweet
 	                    where handle = '%s' and date between '%s' and '%s';""" % (self.handle, start, end)
-
+        
         tweet_rows = self.run_query(query)
         tweets = []
 
         for row in tweet_rows:
             tweets.append(Tweet(*row))
-
+        
         return tweets
-
-    def get_tweets_between_date_times(self, start, end) -> list:
+    
+    def get_tweets_between_date_times(self, start, end)->list:
         query = """select tweetID, date, time, content, favorites, retweet, replies, link from tweet
 	                    where handle = '%s' and time between '%s' and '%s';""" % (self.handle, start, end)
-
+        
         tweet_rows = self.run_query(query)
         tweets = []
 
         for row in tweet_rows:
             tweets.append(Tweet(*row))
-
+        
         return tweets
 
-    def get_tweets_by_x(self, x: str, descending=True, ):
+    def get_tweets_by_x(self, x:str, descending = True,):
 
-        if (descending):
+        if(descending):
             order_by = 'DESC'
         else:
             order_by = 'ASC'
@@ -323,48 +351,49 @@ class dbClient():
         elif x in valid_tweet_sorts:
             x = "tweet." + x
         elif x == "retweets":
-            x = "tweet.retweet"  # TODO: prolly should just rename this column
+            x = "tweet.retweet" #TODO: prolly should just rename this column
         else:
             return -1
-
-        query = """select tweet.tweetID, tweet.content, tweet.dateTime, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
+        
+        query = """select tweet.tweetID, tweet.content,  tweet.datetime, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
                         order by %s %s""" % (self.handle, x, order_by)
-
+        
         tweet_rows = self.run_query(query)
 
         tweets = []
 
         for row in tweet_rows:
             tweets.append(Tweet(*row))
-
+        
         return tweets
+        
 
-    def get_top_five_tweets(self, descending=True) -> list:
-        if (descending):
+    def get_top_five_tweets(self, descending = True)->list:
+        if(descending):
             order_by = 'DESC'
         else:
             order_by = 'ASC'
 
-        query = """select tweet.tweetID, tweet.content, tweet.dateTime, sum(followEvent.gainOrLoss) as impact from tweet
+        query = """select tweet.tweetID, tweet.content,  tweet.datetime, sum(followEvent.gainOrLoss) as impact from tweet
                         inner join followEvent on tweet.tweetID = followEvent.associatedTweet
                         where tweet.handle = '%s'
                         group by tweet.tweetID
                         order by impact %s
                         limit 5;""" % (self.handle, order_by)
-
+        
         tweet_rows = self.run_query(query)
 
         tweets = []
 
         for row in tweet_rows:
             tweets.append(Tweet(*row))
-
+        
         return tweets
 
-    def get_accounts(self) -> list:
+    def get_accounts(self)->list:
         query = """select handle from twitterAccount where associatedAccount = "%s";""" % (self.email)
         account_rows = self.run_query(query)
 
@@ -372,12 +401,13 @@ class dbClient():
 
         for row in account_rows:
             accounts.append(row[0])
-
+        
         return accounts
+
 
     def close_connection(self):
         self.og_conn.close()
-
+	
     def get_password(self):
         return self.password
 
@@ -389,10 +419,10 @@ class dbClient():
     def check_password(self, input_password):
         return bcrypt.checkpw(self.password, input_password)
 
-
+	
 '''
     def lifetime_change(self, start, end) -> int: 
-
+        
         should return lifetime change, just not sure where to get start/end to pass in call below
     	query = """select
                         (select (count(*) from followEvent where associatedAccount = '%s' and gainOrLoss = '1' and (time between '%s' and '%s')
@@ -404,13 +434,12 @@ class dbClient():
         return rate
         '''
 
-
 class twitterAccountData():
 
-    def __init__(self, dbClient: dbClient):
+    def __init__(self, dbClient:dbClient):
         self.FollowCount = dbClient.get_follow_count()
         self.UnfollowCount = dbClient.get_unfollow_count()
         self.NetFollowCount = abs(self.FollowCount - self.UnfollowCount)
         self.TweetCount = dbClient.get_tweet_count()
-        self.AvgFollowRate = 0  # TODO
-        self.ChangeFromLifetime = 0  # TODO query/function is written, just need to call (pass start/end times)
+        self.AvgFollowRate = 0 #TODO
+        self.ChangeFromLifetime = 0 #TODO query/function is written, just need to call (pass start/end times)
