@@ -98,10 +98,11 @@ class dbClient():
             print(ex)
     
     def get_follow_count(self)->int:
-        query = "select followers from twitterAccount where handle = '%s';" % (self.handle)
+        query = """select SUM(gainOrLoss), associatedAccount from followEvent 
+        where gainOrLoss > 0 and associatedAccount = '%s';""" % (self.handle)
         count = self.run_query(query)[0][0]
         if count is not None:
-            return count
+            return int(count)
         else:
             return 0
     
@@ -470,6 +471,6 @@ class twitterAccountData():
     def __init__(self, dbClient:dbClient):
         self.FollowCount = dbClient.get_follow_count()
         self.UnfollowCount = dbClient.get_unfollow_count()
-        self.NetFollowCount = abs(self.FollowCount - self.UnfollowCount)
+        self.NetFollowCount = self.FollowCount - self.UnfollowCount
         self.TweetCount = dbClient.get_tweet_count()
         self.AvgFollowRate = "{:.2f}".format(dbClient.lifetime_change())
