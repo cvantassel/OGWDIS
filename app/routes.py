@@ -128,8 +128,8 @@ def tweet(tweetID:str):
 
         return render_template("tweet.html", tweet=tweet, timeWindows=tweetWindows)
 
-@app.route('/settings')
-def settings():
+@app.route('/preferences')
+def preferences():
     client = dbClient(config)
     client.set_handle(HANDLE)
     client.set_email(EMAIL)
@@ -139,10 +139,10 @@ def settings():
 
 
     # request.form['name']
-    return render_template("settings.html", accounts=account, tweetWindows=tweetWindows, res=res)
+    return render_template("preferences.html", accounts=account, tweetWindows=tweetWindows, res=res)
 
-@app.route('/settings', methods=['POST'])
-def updateSettings():
+@app.route('/preferences', methods=['POST'])
+def updatepreferences():
 
     client = dbClient(config)
     client.set_handle(HANDLE)
@@ -152,18 +152,18 @@ def updateSettings():
     client.run_query(query)
 
 
-    return redirect('/settings?res=' + 'Done!')
+    return redirect('/preferences?res=' + 'Done!')
 
 
-@app.route('/preferences')
-def preferences():
+@app.route('/settings')
+def settings():
 
     res = request.args.get('res', " ")
     error = request.args.get('error', " ")
-    return render_template("preferences.html", error=error, res=res)
+    return render_template("settings.html", error=error, res=res)
 
-@app.route('/preferences', methods=['POST'])
-def updatePreferences():
+@app.route('/settings', methods=['POST'])
+def updateSettings():
 
     client = dbClient(config)
     client.set_handle(HANDLE)
@@ -182,9 +182,9 @@ def updatePreferences():
 
     # Check Errors
     if (password != confirmPassword):
-        return redirect("/preferences?error=" + "Passwords%20Don%27t%20Match")
+        return redirect("/settings?error=" + "Passwords%20Don%27t%20Match")
     if (not re.search("^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$", email)):
-        return redirect("/preferences?error=" + "Invalid%20Email")
+        return redirect("/settings?error=" + "Invalid%20Email")
     
     # Run Queries
     if (email != ""):
@@ -195,7 +195,7 @@ def updatePreferences():
         query = "update ogAccount set email = '%s', password = '%s' where email = '%s'" % (EMAIL, hashed, EMAIL)
 
     client.run_query(query)
-    return redirect('/preferences?res=' + 'Done!')
+    return redirect('/settings?res=' + 'Done!')
 
 
 @app.route('/deleteAcct')
