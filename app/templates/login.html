@@ -10,10 +10,14 @@
                 <input type="text" name="email"/><br/>
                 <label for="password">Password: </label><br/>
                 <input type="password" name="password"/><br/>
-                <center><button type="submit" style="margin-left: 0rem;" class='btn' name='submitType' value="Log In">Log In</button>
-                <p style="color:red">{{ error }}</p></center>
+                <center>
+                    <button type="submit" style="margin-left: 0rem;" class='btn' name='submitType' value="Log In">Log In</button>
+                    <br/>
+                    <button class="btn" onclick="window.location.href = '/signup';" name='submitType' value="Create Account">Create Account</button>
+
+                    <p style="color:red">{{ error }}</p>
+                </center>
             </form>
-            <button class="btn" onclick="window.location.href = '/signup';" name='submitType' value="Create Account">Create Account</button>
 
         </div>
     </body>
