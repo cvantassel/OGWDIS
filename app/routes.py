@@ -12,8 +12,8 @@ from app import app
 from app.config import config
 from app.dbClient import dbClient, twitterAccountData
 
-HANDLE = "@egg620"
-EMAIL = "jesse@comcast.com"
+HANDLE = ""
+EMAIL = ""
 
 tweetWindows = ["hour", "day", "week"]
 
@@ -240,7 +240,9 @@ def signIntoAccount():
         pwdhash = str(pwdhash)
         print(stored)
         print(pwdhash)
+        print("HIT1")
         if (pwdhash == stored):
+            print("HIT")
             global EMAIL
             global HANDLE
             EMAIL = email
@@ -253,13 +255,13 @@ def signIntoAccount():
 
 
 @app.route('/signup')
-def signin():
+def signUp():
     error = request.args.get('error', " ")
     return render_template("signup.html", error=error)
 
 @app.route('/signup', methods=['POST', 'GET'])
 # hashing based on code from https://dev.to/brunooliveira/flask-series-part-10-allowing-users-to-register-and-login-1enb
-def signUp():
+def signUpHandler():
     client = dbClient(config)
     email = request.form['email']
     password = request.form['password']
