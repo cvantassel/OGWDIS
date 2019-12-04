@@ -4,15 +4,15 @@
     </head>
     <body id="loginBody">
         <div id="loginContainer">
-            <h1 style="width: 100%; text-align: center;">OGWDIS</h1>
-            <button onclick="window.location.href = '/signup';">Create Account</button>
+            <h1 style="width: 100%; text-align: center;">OG: Oh God, What Did I Say?</h1>
             <form method="POST" id="loginForm">
                 <label for="email">Email: </label><br/>
                 <input type="text" name="email"/><br/>
                 <label for="password">Password: </label><br/>
                 <input type="password" name="password"/><br/>
-                <button type="submit" style="margin-left: 0rem;" class='btn'>Log In</button>
+                <button type="submit" style="margin-left: 0rem;" class='btn' name='submitType' value="Log In">Log In</button>
                 <center><p style="color:red">{{ error }}</p></center>
+                <button type="submit" style="margin-left: 0rem;" class='btn' name='submitType' value="Create Account">Create Account</button>
             </form>
         </div>
     </body>

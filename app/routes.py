@@ -25,9 +25,9 @@ def home():
 
     if request.method == 'POST':
         if request.form['posOrNeg'] == 'Positive':
-            is_descending = False
-        else:
             is_descending = True
+        else:
+            is_descending = False
         
         client = dbClient(config)
         client.set_handle(HANDLE)
@@ -219,33 +219,36 @@ def login():
 @app.route('/', methods=['POST'])
 @app.route('/login', methods=['POST'])
 def signIntoAccount():
-    # hashing based on code from https://dev.to/brunooliveira/flask-series-part-10-allowing-users-to-register-and-login-1enb
-    client = dbClient(config)
-    email = request.form['email']
-    password = request.form['password']
-    checkPassword = client.run_query("select password from ogAccount where email = '" + email + "'")
+    if request.form['submitType'] == "Create Account":
+        return redirect("/signup")
+    elif request.form['submitType'] == "Log In":
+        # hashing based on code from https://dev.to/brunooliveira/flask-series-part-10-allowing-users-to-register-and-login-1enb
+        client = dbClient(config)
+        email = request.form['email']
+        password = request.form['password']
+        checkPassword = client.run_query("select password from ogAccount where email = '" + email + "'")
 
-    stored = checkPassword[0][0]
-    salt = stored[:64]
-    stored = stored[64:]
-    pwdhash = hashlib.pbkdf2_hmac('sha512',
-                                  password.encode('utf-8'),
-                                  salt.encode('ascii'),
-                                  100000)
-    pwdhash = binascii.hexlify(pwdhash).decode('ascii')
-    pwdhash = str(pwdhash)
-    print(stored)
-    print(pwdhash)
-    if (pwdhash == stored):
-        global EMAIL
-        global HANDLE
-        EMAIL = email
-        HANDLE = client.run_query("select defaultAccount from ogAccount where email = '" + EMAIL +"'")
-        HANDLE = HANDLE[0][0]
-        print(HANDLE)
-        return redirect("/home")
-    else:
-        return redirect("/login?error=" + "Invalid%20Account")
+        stored = checkPassword[0][0]
+        salt = stored[:64]
+        stored = stored[64:]
+        pwdhash = hashlib.pbkdf2_hmac('sha512',
+                                    password.encode('utf-8'),
+                                    salt.encode('ascii'),
+                                    100000)
+        pwdhash = binascii.hexlify(pwdhash).decode('ascii')
+        pwdhash = str(pwdhash)
+        print(stored)
+        print(pwdhash)
+        if (pwdhash == stored):
+            global EMAIL
+            global HANDLE
+            EMAIL = email
+            HANDLE = client.run_query("select defaultAccount from ogAccount where email = '" + EMAIL +"'")
+            HANDLE = HANDLE[0][0]
+            print(HANDLE)
+            return redirect("/home")
+        else:
+            return redirect("/login?error=" + "Invalid%20Account")
 
 
 @app.route('/signup')
@@ -260,6 +263,7 @@ def signUp():
     email = request.form['email']
     password = request.form['password']
     check_pass = request.form['confirmPassword']
+    handle = request.form['handle']
 
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
     pwdhash = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'),
@@ -269,9 +273,8 @@ def signUp():
     hashed = str(hashed)
 
     if password == check_pass:
-        default_handle = "@default_handle"
-        client.create_twitter_account(default_handle, email, hashed, email) #TODO: Change with api integration
-        query = '''insert into ogAccount values ("{0}", "{1}", "{2}", 'hour');'''.format(email, hashed, default_handle)
+        client.create_twitter_account(handle, email, hashed, email) #TODO: Change with api integration
+        query = '''insert into ogAccount values ("{0}", "{1}", "{2}", 'hour');'''.format(email, hashed, handle)
         client.run_insert_query(query)
         return redirect("/login")
     else:
@@ -290,6 +293,7 @@ def fakeFunctionHandler():
     client.set_email(EMAIL)
 
     if 'tweet' in request.form:
+        
         tweet = request.form['tweet']
         currentTime = time.strftime('%Y-%m-%d %H:%M:%S')
         client.run_insert_query("insert into tweet (handle, content, datetime) values ('%s', '%s', '%s');" % (HANDLE, tweet, currentTime))

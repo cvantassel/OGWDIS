@@ -294,18 +294,19 @@ class dbClient():
 
         query = """select tweet.tweetID, tweet.content,  tweet.datetime, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
                 inner join followEvent on tweet.tweetID = followEvent.associatedTweet
-                where tweet.handle = '%s'""" % (self.handle,)
+                where tweet.handle = '%s' AND(""" % (self.handle,)
         
         first_keyword = True
 
         for keyword in keywords:
 
             if first_keyword:
-                query += "\nAND tweet.content LIKE '%{}%'\n".format(keyword)
+                query += "\ntweet.content LIKE '%{}%'\n".format(keyword)
                 first_keyword = False
             else:
                 query += "OR tweet.content LIKE '%{}%'\n".format(keyword)
         
+        query += ")\n"
         query += "group by tweet.tweetID;"
 
         tweet_rows = self.run_query(query)
