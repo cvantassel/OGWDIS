@@ -1,13 +1,19 @@
-from app import app
-import mysql.connector as conn
-from app.config import config
-from app.dbClient import dbClient, twitterAccountData, Tweet
-from flask import render_template, request, redirect
+import binascii
+import os
 import re
-import time    
+import time
+import random
 
-HANDLE = "@applejuice"
-EMAIL = "eidac@att.net"
+from flask import render_template, request, redirect
+import hashlib
+
+
+from app import app
+from app.config import config
+from app.dbClient import dbClient, twitterAccountData
+
+HANDLE = "@egg620"
+EMAIL = "jesse@comcast.com"
 
 tweetWindows = ["hour", "day", "week"]
 
@@ -20,9 +26,9 @@ def home():
 
     if request.method == 'POST':
         if request.form['posOrNeg'] == 'Positive':
-            is_descending = False
-        else:
             is_descending = True
+        else:
+            is_descending = False
         
         client = dbClient(config)
         client.set_handle(HANDLE)
@@ -167,7 +173,12 @@ def updatePreferences():
     email = request.form['email']
     password = request.form['password']
     confirmPassword = request.form['confirmPassword']
-
+    salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
+    pwdhash = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'),
+                                  salt, 100000)
+    pwdhash = binascii.hexlify(pwdhash)
+    hashed = (salt + pwdhash).decode('ascii')
+    hashed = str(hashed)
 
     # Check Errors
     if (password != confirmPassword):
@@ -179,9 +190,9 @@ def updatePreferences():
     if (email != ""):
         query = "update ogAccount set email = '%s' where email = '%s'" % (email, EMAIL)
     if (password != "" & confirmPassword != ""):
-        query = "update ogAccount set password = '%s' where email = '%s'" % (PASSWORD, EMAIL)
+        query = "update ogAccount set password = '%s' where email = '%s'" % (hashed, EMAIL)
     if (email != "" & password != "" & confirmPassword != ""):
-        query = "update ogAccount set email = '%s', password = '%s' where email = '%s'" % (EMAIL, PASSWORD, EMAIL)
+        query = "update ogAccount set email = '%s', password = '%s' where email = '%s'" % (EMAIL, hashed, EMAIL)
 
     client.run_query(query)
     return redirect('/preferences?res=' + 'Done!')
@@ -209,40 +220,63 @@ def login():
 @app.route('/', methods=['POST'])
 @app.route('/login', methods=['POST'])
 def signIntoAccount():
-    client = dbClient(config)
-    email = request.form['email']
-    password = request.form['password']
+    if request.form['submitType'] == "Create Account":
+        return redirect("/signup")
+    elif request.form['submitType'] == "Log In":
+        # hashing based on code from https://dev.to/brunooliveira/flask-series-part-10-allowing-users-to-register-and-login-1enb
+        client = dbClient(config)
+        email = request.form['email']
+        password = request.form['password']
+        checkPassword = client.run_query("select password from ogAccount where email = '" + email + "'")
 
-    checkPassword = client.run_query("select password from ogAccount where email = '" + email +"'")
-    print(checkPassword)
-    if (checkPassword != []):
-        if (password == checkPassword[0][0]):
+        stored = checkPassword[0][0]
+        salt = stored[:64]
+        stored = stored[64:]
+        pwdhash = hashlib.pbkdf2_hmac('sha512',
+                                    password.encode('utf-8'),
+                                    salt.encode('ascii'),
+                                    100000)
+        pwdhash = binascii.hexlify(pwdhash).decode('ascii')
+        pwdhash = str(pwdhash)
+        print(stored)
+        print(pwdhash)
+        if (pwdhash == stored):
             global EMAIL
             global HANDLE
             EMAIL = email
             HANDLE = client.run_query("select defaultAccount from ogAccount where email = '" + EMAIL +"'")
             HANDLE = HANDLE[0][0]
+            print(HANDLE)
             return redirect("/home")
-    else:
-        return redirect("/login?error=" + "Invalid%20Account")
-    
+        else:
+            return redirect("/login?error=" + "Invalid%20Account")
+
+
 @app.route('/signup')
 def signin():
     error = request.args.get('error', " ")
     return render_template("signup.html", error=error)
 
-
 @app.route('/signup', methods=['POST', 'GET'])
+# hashing based on code from https://dev.to/brunooliveira/flask-series-part-10-allowing-users-to-register-and-login-1enb
 def signUp():
     client = dbClient(config)
     email = request.form['email']
     password = request.form['password']
-    check_pass = request.form['confirm password']
-    
- #TODO get query to insert into table
+    check_pass = request.form['confirmPassword']
+    handle = request.form['handle']
+
+    salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
+    pwdhash = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'),
+                                  salt, 100000)
+    pwdhash = binascii.hexlify(pwdhash)
+    hashed= (salt + pwdhash).decode('ascii')
+    hashed = str(hashed)
+
     if password == check_pass:
-        hashed = dbClient.set_password(password)
-        client.run_query("insert into ogAccount values('" + email + "', '" + hashed + "', NULL, 'hour');")
+        client.create_twitter_account(handle, email, hashed, email) #TODO: Change with api integration
+        query = '''insert into ogAccount values ("{0}", "{1}", "{2}", 'hour');'''.format(email, hashed, handle)
+        client.run_insert_query(query)
         return redirect("/login")
     else:
         return redirect("/signup?error=" + "Passwords%20Don%27t%20Match")
@@ -260,9 +294,13 @@ def fakeFunctionHandler():
     client.set_email(EMAIL)
 
     if 'tweet' in request.form:
+
+        def ran_num():
+            return random.randint(1,99)
+        
         tweet = request.form['tweet']
         currentTime = time.strftime('%Y-%m-%d %H:%M:%S')
-        client.run_insert_query("insert into tweet (handle, content, datetime) values ('%s', '%s', '%s');" % (HANDLE, tweet, currentTime))
+        client.run_insert_query("insert into tweet (handle, content, datetime, retweet, favorites, replies) values ('%s', '%s', '%s', %d, %d, %d);" % (HANDLE, tweet, currentTime, ran_num(), ran_num(), ran_num()))
 
     if 'handle' in request.form:        
         follower_handle = request.form['handle']

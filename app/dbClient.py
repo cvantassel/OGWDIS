@@ -98,10 +98,11 @@ class dbClient():
             print(ex)
     
     def get_follow_count(self)->int:
-        query = "select followers from twitterAccount where handle = '%s';" % (self.handle)
+        query = """select SUM(gainOrLoss), associatedAccount from followEvent 
+        where gainOrLoss > 0 and associatedAccount = '%s';""" % (self.handle)
         count = self.run_query(query)[0][0]
         if count is not None:
-            return count
+            return int(count)
         else:
             return 0
     
@@ -294,18 +295,19 @@ class dbClient():
 
         query = """select tweet.tweetID, tweet.content,  tweet.datetime, sum(followEvent.gainOrLoss), tweet.favorites, tweet.retweet, tweet.replies, tweet.link from tweet
                 inner join followEvent on tweet.tweetID = followEvent.associatedTweet
-                where tweet.handle = '%s'""" % (self.handle,)
+                where tweet.handle = '%s' AND(""" % (self.handle,)
         
         first_keyword = True
 
         for keyword in keywords:
 
             if first_keyword:
-                query += "\nAND tweet.content LIKE '%{}%'\n".format(keyword)
+                query += "\ntweet.content LIKE '%{}%'\n".format(keyword)
                 first_keyword = False
             else:
                 query += "OR tweet.content LIKE '%{}%'\n".format(keyword)
         
+        query += ")\n"
         query += "group by tweet.tweetID;"
 
         tweet_rows = self.run_query(query)
@@ -337,6 +339,10 @@ class dbClient():
             tweets.append(Tweet(*row))
         
         return tweets
+    
+    def create_twitter_account(self, handle, twitter_email, password, og_email, followers= 100):
+        query = """INSERT INTO twitterAccount VALUES ('%s', '%s', '%s', '%s', '%s', %d);""" % (handle, twitter_email, password, datetime.now() , og_email, followers)
+        self.run_insert_query(query)
     
     def get_tweets_between_date_times(self, start, end)->list:
         query = """select tweetID, date, time, content, favorites, retweet, replies, link from tweet
@@ -441,8 +447,22 @@ class dbClient():
                                             where associatedAccount = '%s'""" % (self.handle)
 
 
-        net_impact = self.run_query(net_impact_query)[0][0]
-        total_events = self.run_query(total_follow_events_query)[0][0]
+        resp = self.run_query(total_follow_events_query)
+        if(len(resp) == 0):
+            return 0
+        else:
+            total_events = resp[0][0]
+            if total_events == 0:
+                return 0.0
+
+        resp = self.run_query(net_impact_query)
+        if(len(resp) == 0):
+            net_impact = 0
+        else:
+            net_impact = resp[0][0]
+            if net_impact is None:
+                net_impact = 0.0
+
 
         return float(net_impact / total_events)
 
@@ -451,6 +471,6 @@ class twitterAccountData():
     def __init__(self, dbClient:dbClient):
         self.FollowCount = dbClient.get_follow_count()
         self.UnfollowCount = dbClient.get_unfollow_count()
-        self.NetFollowCount = abs(self.FollowCount - self.UnfollowCount)
+        self.NetFollowCount = self.FollowCount - self.UnfollowCount
         self.TweetCount = dbClient.get_tweet_count()
         self.AvgFollowRate = "{:.2f}".format(dbClient.lifetime_change())

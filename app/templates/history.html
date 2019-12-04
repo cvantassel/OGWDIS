@@ -6,7 +6,7 @@
             <nav class="navbar">
                 <div class="container">
                     
-                    <h1 class="logo"><a href="#">OGWDIS</a></h1>
+                    <h1 class="logo"><a href="#">OG: Oh God, What Did I Say?</a></h1>
                     <ul class="nav nav-right">
                             <li><a href="home">Home</a></li>
                             <li><a href="#">History</a></li>
@@ -30,12 +30,6 @@
                             <input type="submit" name="sortBy", value= "Favorites"/>
                             <input type="submit" name="sortBy", value= "Retweets"/>
                             <input type="submit" name="sortBy", value= "Replies"/>
-                            
-                            <select>
-                                {% for window in tweetWindows %}
-                                <option value="{{ window }}">{{ window }}</option>
-                                {% endfor %}
-                            </select> 
                             <input type="checkbox" name="ascending"> Ascending </input>
                         </form>
 
