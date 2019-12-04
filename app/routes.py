@@ -2,6 +2,7 @@ import binascii
 import os
 import re
 import time
+import random
 
 from flask import render_template, request, redirect
 import hashlib
@@ -293,10 +294,13 @@ def fakeFunctionHandler():
     client.set_email(EMAIL)
 
     if 'tweet' in request.form:
+
+        def ran_num():
+            return random.randint(1,99)
         
         tweet = request.form['tweet']
         currentTime = time.strftime('%Y-%m-%d %H:%M:%S')
-        client.run_insert_query("insert into tweet (handle, content, datetime) values ('%s', '%s', '%s');" % (HANDLE, tweet, currentTime))
+        client.run_insert_query("insert into tweet (handle, content, datetime, retweet, favorites, replies) values ('%s', '%s', '%s', %d, %d, %d);" % (HANDLE, tweet, currentTime, ran_num(), ran_num(), ran_num()))
 
     if 'handle' in request.form:        
         follower_handle = request.form['handle']
